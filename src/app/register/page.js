@@ -22,7 +22,7 @@ import {
     FormMessage,
 } from "../../components/ui/form";
 import { Input } from "@/components/ui/input";
-import React from "react";
+import { React , useState} from "react";
 
 // Define form validation schema with new fields
 const formSchema = z.object({
@@ -33,26 +33,29 @@ const formSchema = z.object({
     first_name: z.string().min(1),
     middle_name: z.string().optional(),
     last_name: z.string().min(1),
-    address: z.string().min(5),
-    dob: z.string().min(10),
-    gender: z.enum(["Male", "Female", "Other"]),
-    country: z.string().min(2),
-    city: z.string().min(2),
-    postal_code: z.string().min(5),
-    profile_picture_url: z.string().url().optional(),
-    preferred_language: z.string().min(2),
-    newsletter_subscribed: z.boolean().default(false),
-    terms_accepted: z.boolean().refine(val => val === true, {
-        message: "You must accept the terms and conditions",
-    }),
+    // address: z.string().min(5),
+    // dob: z.string().min(10),
+    // gender: z.enum(["Male", "Female", "Other"]),
+    // country: z.string().min(2),
+    // city: z.string().min(2),
+    // postal_code: z.string().min(5),
+    // profile_picture_url: z.string().url().optional(),
+    // preferred_language: z.string().min(2),
+    // newsletter_subscribed: z.boolean().default(false),
+    // terms_accepted: z.boolean().refine(val => val === true, {
+    //     message: "You must accept the terms and conditions",
+    // }),
 });
 
 const Register = () => {
-    // 1. Define your form.
+    const [loading, setLoading] = useState(false);
+    const [error, setError] = useState(null);
+    const [successMessage, setSuccessMessage] = useState(null);
+    console.log('method has been called')
 
-    const [date, setDate] = React.useState()
+    // Define form with validation
     const form = useForm({
-        resolver: zodResolver(formSchema),
+        // resolver: zodResolver(formSchema),
         defaultValues: {
             username: "",
             password: "",
@@ -61,29 +64,78 @@ const Register = () => {
             first_name: "",
             middle_name: "",
             last_name: "",
-            address: "",
-            dob: "",
-            gender: "Male",
-            country: "",
-            city: "",
-            postal_code: "",
-            profile_picture_url: "",
-            preferred_language: "English",
-            newsletter_subscribed: false,
-            terms_accepted: false,
+            // address: "",
+            // dob: "",
+            // gender: "Male",
+            // country: "",
+            // city: "",
+            // postal_code: "",
+            // profile_picture_url: "",
+            // preferred_language: "English",
+            // newsletter_subscribed: false,
+            // terms_accepted: false,
         },
     });
 
-    // 2. Define a submit handler.
-    function onSubmit(values) {
-        // Do something with the form values.
-        console.log(values);
-    }
+    // Handle form submission
+    async function onSubmit(values) {
+        setLoading(true); // Set loading state
 
+        // Prepare data for API call
+        const requestData = {
+            username: values.username,
+            password: values.password,
+            email: values.email,
+            mobile: values.mobile,
+            first_name: values.first_name,
+            middle_name: values.middle_name || "", // Optional
+            last_name: values.last_name,
+        };
+        console.log('data --------------------\n',requestData)
+        try {
+            // Send POST request to the API
+            const response = await fetch('http://127.0.0.1:3004/user/public/create/user', {
+                method: 'POST',
+                headers: {
+                    'Accept': 'application/json',
+                    'Content-Type': 'application/json',
+                },
+                body: JSON.stringify(requestData),
+            });
+
+            // Handle response
+            if (response.ok) {
+                console.log(response)
+                const data = await response.json();
+                setSuccessMessage('User registered successfully!');
+                form.reset(); // Reset form after successful registration
+            } else {
+                const errorData = await response.json();
+                setError(errorData.message || 'Something went wrong');
+            }
+        } catch (error) {
+            setError('An error occurred while trying to register');
+        } finally {
+            setLoading(false); // Reset loading state
+        }
+    }
 
     return (
         <div className="max-w-3xl mx-auto p-8 bg-white rounded-lg shadow-lg space-y-6">
             <h2 className="text-3xl font-semibold text-center text-blue-600 mb-8">User Registration</h2>
+
+            {successMessage && (
+                <div className="bg-green-100 text-green-700 p-4 rounded mb-4">
+                    {successMessage}
+                </div>
+            )}
+
+            {error && (
+                <div className="bg-red-100 text-red-700 p-4 rounded mb-4">
+                    {error}
+                </div>
+            )}
+
             <Form {...form}>
                 <form onSubmit={form.handleSubmit(onSubmit)} className="space-y-6">
                     {/* Username and Password Fields */}
@@ -222,7 +274,7 @@ const Register = () => {
                                 </FormItem>
                             )}
                         />
-
+{/* 
                         <FormField
                             control={form.control}
                             name="address"
@@ -239,12 +291,12 @@ const Register = () => {
                                     <FormMessage />
                                 </FormItem>
                             )}
-                        />
+                        /> */}
                     </div>
 
                     {/* Date of Birth and Gender Fields */}
                     <div className="grid grid-cols-1 sm:grid-cols-2 gap-6">
-                        <FormField
+                        {/* <FormField
                             control={form.control}
                             name="dob"
                             render={({ field }) => (
@@ -256,34 +308,12 @@ const Register = () => {
                                             className="w-full p-3 border border-gray-300 rounded-md focus:outline-none focus:ring-2 focus:ring-blue-500"
                                             {...field}
                                         />
-                                        {/* <Popover>
-                                            <PopoverTrigger asChild>
-                                                <Button
-                                                    variant={"outline"}
-                                                    className={cn(
-                                                        "w-[280px] justify-start text-left font-normal",
-                                                        !date && "text-muted-foreground"
-                                                    )}
-                                                >
-                                                    <CalendarIcon className="mr-2 h-4 w-4" />
-                                                    {date ? format(date, "PPP") : <span>Pick a date</span>}
-                                                </Button>
-                                            </PopoverTrigger>
-                                            <PopoverContent className="w-auto p-0">
-                                                <Calendar
-                                                    mode="single"
-                                                    selected={date}
-                                                    onSelect={setDate}
-                                                    initialFocus
-                                                />
-                                            </PopoverContent>
-                                        </Popover> */}
                                     </FormControl>
                                     <FormMessage />
                                 </FormItem>
                             )}
-                        />
-
+                        /> */}
+{/* 
                         <FormField
                             control={form.control}
                             name="gender"
@@ -303,12 +333,12 @@ const Register = () => {
                                     <FormMessage />
                                 </FormItem>
                             )}
-                        />
+                        /> */}
                     </div>
 
                     {/* Country, City and Postal Code Fields */}
                     <div className="grid grid-cols-1 sm:grid-cols-2 gap-6">
-                        <FormField
+                        {/* <FormField
                             control={form.control}
                             name="country"
                             render={({ field }) => (
@@ -324,9 +354,9 @@ const Register = () => {
                                     <FormMessage />
                                 </FormItem>
                             )}
-                        />
+                        /> */}
 
-                        <FormField
+                        {/* <FormField
                             control={form.control}
                             name="city"
                             render={({ field }) => (
@@ -342,11 +372,11 @@ const Register = () => {
                                     <FormMessage />
                                 </FormItem>
                             )}
-                        />
+                        /> */}
                     </div>
 
                     <div className="grid grid-cols-1 sm:grid-cols-2 gap-6">
-                        <FormField
+                        {/* <FormField
                             control={form.control}
                             name="postal_code"
                             render={({ field }) => (
@@ -362,12 +392,12 @@ const Register = () => {
                                     <FormMessage />
                                 </FormItem>
                             )}
-                        />
+                        /> */}
                     </div>
 
                     {/* Newsletter and Terms Acceptance */}
                     <div className="flex items-center space-x-4">
-                        <FormField
+                        {/* <FormField
                             control={form.control}
                             name="newsletter_subscribed"
                             render={({ field }) => (
@@ -382,9 +412,9 @@ const Register = () => {
                                     </FormControl>
                                 </FormItem>
                             )}
-                        />
+                        /> */}
 
-                        <FormField
+                        {/* <FormField
                             control={form.control}
                             name="terms_accepted"
                             render={({ field }) => (
@@ -399,15 +429,16 @@ const Register = () => {
                                     </FormControl>
                                 </FormItem>
                             )}
-                        />
+                        /> */}
                     </div>
 
                     {/* Submit Button */}
                     <Button
                         type="submit"
                         className="w-full py-3 mt-6 text-white bg-blue-600 rounded-md hover:bg-blue-700 focus:outline-none"
+                        disabled={loading}
                     >
-                        Register
+                        {loading ? 'Registering...' : 'Register'}
                     </Button>
                 </form>
             </Form>

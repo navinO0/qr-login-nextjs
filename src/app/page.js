@@ -1,17 +1,32 @@
 "use client";
 import useProtectedRoute from "@/core/protectedRoute";
+import {
+  Menubar,
+  MenubarCheckboxItem,
+  MenubarContent,
+  MenubarItem,
+  MenubarMenu,
+  MenubarRadioGroup,
+  MenubarRadioItem,
+  MenubarSeparator,
+  MenubarShortcut,
+  MenubarSub,
+  MenubarSubContent,
+  MenubarSubTrigger,
+  MenubarTrigger,
+} from "@/components/ui/menubar"
+import Qr_gen from "@/core/qr_generator";
+import Header from "@/core/header";
+
 
 export default function Home() {
   useProtectedRoute();
+  const showQR = () => {
+    console.log("show qr")
+  }
   return (
-    <div className="flex flex-col items-center justify-center min-h-screen"
-    >
-     <h1>main page</h1>
+    <div className = "home-container">
+      <Header />
     </div>
   );
 }
-
-
-// todo
-// login(create, update(forgot password)) -> home
-//shadcn
