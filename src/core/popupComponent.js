@@ -16,14 +16,14 @@ const PopupComponent = () => {
         setIsLoading(true);
         const token = Cookies.get('jwt_token');
 
-        if (!token) {
+        if (!token || token === 'undefined') {
             setError('No token found');
             setIsLoading(false);
             return;
         }
 
         try {
-            const response = await fetch('http://127.0.0.1:3004/user/get/code', {
+            const response = await fetch('http://127.0.0.1:3009/user/get/code', {
                 method: 'POST',
                 headers: {
                     'Accept': 'application/json',
@@ -34,9 +34,15 @@ const PopupComponent = () => {
             });
 
             if (response.ok) {
-                const data = await response.json();
-                setQrLoginCode(data.code); // Store the QR code
-                console.log(data);
+                const resp = await response.json();
+                const loginCode = resp.data.code
+                console.log(loginCode)
+                if(!loginCode || loginCode === 'undefined') {
+                    setError('No login code found');
+                    setIsLoading(false);
+                    return;
+                }
+                setQrLoginCode(loginCode); // Store the QR code
             } else {
                 const errorData = await response.json();
                 setError(errorData.message || 'An error occurred while logging in.');
@@ -55,7 +61,7 @@ const PopupComponent = () => {
 
     return (
         <Popup
-            trigger={<button className="button">Open Modal</button>}
+            trigger={<button className="button">Add device</button>}
             modal
             nested
             onOpen={handleOpenModal} // Trigger the API call when the modal opens
@@ -65,23 +71,23 @@ const PopupComponent = () => {
                     <button className="close" onClick={close}>
                         &times;
                     </button>
-                    <div className="header">Modal Title</div>
+                    <div className="header">Scan to Login</div>
                     <div className="content">
                         {isLoading ? (
                             <p>Loading...</p>
                         ) : error ? (
                             <p>{error}</p>
                         ) : (
-                            qrLoginCode && <Qr_gen qr_link={{ link: `http://127.0.0.1:3004/user/login/code/${qrLoginCode}` }} />
+                            qrLoginCode && <Qr_gen qr_link={{ link: `http://127.0.0.1:3009/user/login/code/${qrLoginCode}`, code : qrLoginCode }}  />
                         )}
                     </div>
                     <div className="actions">
                         <Popup
-                            trigger={<button className="button">Trigger</button>}
+                            trigger={<button className="button">pp</button>}
                             position="top center"
                             nested
                         >
-                            {/* You can place additional content here */}
+                            scan this to login to your account
                         </Popup>
                         <button
                             className="button"

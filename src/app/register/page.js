@@ -91,10 +91,9 @@ const Register = () => {
             middle_name: values.middle_name || "", // Optional
             last_name: values.last_name,
         };
-        console.log('data --------------------\n',requestData)
         try {
             // Send POST request to the API
-            const response = await fetch('http://127.0.0.1:3004/user/public/create/user', {
+            const response = await fetch(`http://127.0.0.1:3009/user/public/create`, {
                 method: 'POST',
                 headers: {
                     'Accept': 'application/json',

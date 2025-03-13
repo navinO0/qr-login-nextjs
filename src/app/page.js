@@ -17,6 +17,8 @@ import {
 } from "@/components/ui/menubar"
 import Qr_gen from "@/core/qr_generator";
 import Header from "@/core/header";
+import { CloseAlert } from "@/core/closeAlert";
+
 
 
 export default function Home() {
@@ -25,8 +27,9 @@ export default function Home() {
     console.log("show qr")
   }
   return (
-    <div className = "home-container">
+    <div className="home-container">
       <Header />
+
     </div>
   );
 }

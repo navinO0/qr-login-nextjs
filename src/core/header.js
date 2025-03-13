@@ -19,19 +19,14 @@ import { useState } from "react"
 import PopupComponent from "./popupComponent"
 import { Router } from "lucide-react"
 import Cookies from "js-cookie"
-import { useRouter } from "next/router"
+import { CloseAlert } from "./closeAlert"
+import { QrWithAlert } from "./qrWithAlert"
+import HeaderProfile from "./headerProfile"
 
 
 const Header = () => {
-    const [isQrShow, setIsQrShow] = useState(false)
-    // setIsMounted (true);
-    // const router = useRouter();
-    const clearToken = () => {
-        Cookies.remove('jwt_token')
-        window.location.reload()
-    }
     return (
-        <div className="header-container">
+        <div className="header-component">
             <Menubar>
                 <MenubarMenu>
                     <MenubarTrigger>File</MenubarTrigger>
@@ -117,11 +112,18 @@ const Header = () => {
                         <MenubarSeparator />
                         <MenubarItem inset>Add Profile...</MenubarItem>
                         <MenubarItem inset> <PopupComponent /> </MenubarItem>
-                        <MenubarItem inset onClick={clearToken}> logout </MenubarItem>
+                        <MenubarItem inset> <span>spn btn</span> </MenubarItem>
                     </MenubarContent>
                 </MenubarMenu>
+                <MenubarMenu>
+                    <MenubarTrigger><QrWithAlert /></MenubarTrigger>
+                </MenubarMenu>
             </Menubar>
-
+            <div className="header-profile">
+                <HeaderProfile />
+                <CloseAlert />
+            </div>
+            
         </div>
     )
 }

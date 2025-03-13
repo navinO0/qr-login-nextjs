@@ -9,6 +9,8 @@ const LoginWithCode = () => {
     const params = useParams();
     const router = useRouter();
     const [loginCode, setLoginCode] = useState(null);
+    const [isLoading, setIsLoading] = useState(false);
+    const [error, setError] = useState(null); // To handle errors
 
     // useEffect to handle the params asynchronously and unwrap them
     useEffect(() => {
@@ -23,36 +25,23 @@ const LoginWithCode = () => {
             console.log("Login code not available");
             return;
         }
-
-        // try {
-        //     const response = await fetch(`http://127.0.0.1:3004/user/login/code/${loginCode}`, {
-        //         method: 'POST',
-        //         headers: {
-        //             'Accept': 'application/json',
-        //         }
-        //     });
-
-        //     if (response.ok) {
-        //         // Handle successful login (get JWT token from response)
-        //         const data = await response.json();
-
-        //         // Store the JWT token in cookies
-        //         if (data.token) {
-        //             Cookies.set('jwt_token', data.token, { expires: 1 }); // Store token for 1 day
-        //         }
-        //         console.log('Login success:', data);
-
-        //         // Redirect to the homepage after successful login
-        //         router.push('/');
-        //     } else {
-        //         const errorData = await response.json();
-        //         console.log('Error:', errorData);
-        //     }
-        // } catch (error) {
-        //     console.error('Login failed:', error);
-        // } finally {
-        //     console.log("Login finished");
-        // }
+        setIsLoading(true);
+        setError(null);
+        try {
+            if (loginCode) {
+                const logi = await loginWithCodeFunc(loginCode);
+                if (!logi.status || logi.status === 'false') {
+                    setError(logi.message)
+                    return
+                }
+                router.push("/")
+            }
+        } catch (error) {
+            setError('Failed to connect to the server.');
+            console.error('Login failed:', error);
+        } finally {
+            setIsLoading(false);
+        }
 
         const logi = await loginWithCodeFunc(loginCode);
         if (!logi) {
@@ -70,7 +59,8 @@ const LoginWithCode = () => {
 
     return (
         <div className="flex flex-col items-center justify-center min-h-screen">
-            <h1>There you are... wait...</h1>
+            <h1> {!error &&  "There you are... wait..." }</h1>
+            {error && <div className="text-red-500 text-sm">{error}</div>}
         </div>
     );
 };

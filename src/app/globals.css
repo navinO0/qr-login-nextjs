@@ -121,7 +121,7 @@
 }
 
 
-/* ------ popup */
+/* ------ popup start */
 
 .modal {
   font-size: 12px;
@@ -214,7 +214,7 @@
   -webkit-animation: anvil 0.3s cubic-bezier(0.38, 0.1, 0.36, 0.9) forwards;
 }
 
-/* -----popup */
+/* -----popup ends*/
 
 @layer base {
   * {
@@ -245,3 +245,42 @@ justify-content: center;
 align-items: center;
 padding : 20px
 } 
+
+
+
+
+
+
+/* ---home starts ----- */
+
+.header-component{
+  display: flex;
+  justify-content: space-between;
+  padding: 10px;
+}
+
+.home-container {
+  background-color:  #2A3132;
+  background-size: cover;
+  height: 100vh;
+}
+
+/* #763626,
+#90AFC5 */
+
+/* ---------home ends ------ */
+
+
+
+
+/* -------- header --------- */
+.header-profile{
+display: flex;
+align-items: center;
+gap: 10px;
+}
+
+/* ----------header ends ------ */
+
+
+/* ---------Home0-0-------- */

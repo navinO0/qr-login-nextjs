@@ -6,6 +6,8 @@ function Qr_gen(props) {
     const { Canvas } = useQRCode();
     const { qr_link } = props
     const link = qr_link.link
+    const code = qr_link.code
+    console.log(code)
     return (
         <div className='popup-container'>
         <Canvas
@@ -21,6 +23,7 @@ function Qr_gen(props) {
                 },
             }}
             />
+            <h1>{code}</h1>
             <h2>{link}</h2>
         </div>
     );

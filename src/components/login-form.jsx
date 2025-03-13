@@ -11,12 +11,13 @@ import Link from 'next/link';
 import { useState, useEffect } from 'react';
 import { useRouter } from 'next/navigation'; // Use this for redirect
 import Cookies from 'js-cookie'; // Import js-cookie to handle cookies
+import loginWithCodeFunc from "@/core/loginWithCodeFunc";
 // Define schema for form validation
-const formSchema = z.object({
-    username: z.string().min(2).max(50).optional(),
-    password: z.string().min(8).max(50).optional(), // Add password validation
-    loginCode : z.string().optional()
-});
+// const formSchema = z.object({
+//     username: z.string().min(2).max(50).optional(),
+//     password: z.string().min(8).max(50).optional(), // Add password validation
+//     loginCode : z.string().optional()
+// });
 
 export function LoginForm({ className, ...props }) {
   const router = useRouter();
@@ -31,9 +32,12 @@ export function LoginForm({ className, ...props }) {
   const [isLoading, setIsLoading] = useState(false);
   const [error, setError] = useState(null); // To handle errors
 
+    const [isLoading1, setIsLoading1] = useState(false);
+    const [error1, setError1] = useState(null); // To handle errors
+
   // Setup form with react-hook-form
   const form = useForm({
-    resolver: zodResolver(formSchema),
+    // resolver: zodResolver(formSchema),
     defaultValues: {
       username: "",
       password: "",
@@ -48,13 +52,14 @@ export function LoginForm({ className, ...props }) {
     const { loginCode, username, password } = values;
     if (loginCode) {
       const logi = await loginWithCodeFunc(loginCode);
-        if (!logi) {
-            router.push("/login")
+      console.log(logi)
+        if (logi !== true) {
+            setError1(logi)
         }
         router.push("/")
     }
     try {
-      const response = await fetch('http://127.0.0.1:3004/user/public/login/user', {
+      const response = await fetch(`${process.env.host || "http://127.0.0.1:3009"}/user/public/login`, {
         method: 'POST',
         headers: {
           'Accept': 'application/json',
@@ -65,13 +70,18 @@ export function LoginForm({ className, ...props }) {
           password: values.password,
         }),
       });
+      console.log(response)
 
       if (response.ok) {
         // Handle successful login (get JWT token from response)
-        const data = await response.json();
-
+        const resp = await response.json();
+        const token = resp.data.token;
         // Store the JWT token in cookies
-        Cookies.set('jwt_token', data.token, { expires: 1 }); // Store token for 1 day
+        if (!token || token === 'undefined') {
+            setError(resp.message || 'An error occurred while logging in.');
+            return
+        }
+        Cookies.set('jwt_token', token, { expires: 1 }); // Store token for 1 day
 
         // Redirect to the homepage after successful login
         router.push('/');
@@ -84,6 +94,27 @@ export function LoginForm({ className, ...props }) {
       console.error('Login failed:', error);
     } finally {
       setIsLoading(false);
+    }
+  };
+
+   const codeSubmit = async (values) => {
+    setIsLoading1(true);
+    setError1(null);
+    const { loginCode  } = values;
+    try {
+     if (loginCode) {
+       const logi = await loginWithCodeFunc(loginCode);
+        if (!logi.status || logi.status === 'false') {
+          setError1(logi.message)
+          return
+        }
+        router.push("/")
+    }
+    } catch (error) {
+      setError1('Failed to connect to the server.');
+      console.error('Login failed:', error);
+    } finally {
+      setIsLoading1(false);
     }
   };
 
@@ -146,7 +177,11 @@ export function LoginForm({ className, ...props }) {
                 placeholder = "********"
                   {...form.register("loginCode")} 
                   required 
-                />
+              />
+              {error1 && <div className="text-red-500 text-sm">{error1}</div>}
+              <Button type="button" onClick={form.handleSubmit(codeSubmit)} className="w-full" disabled={isLoading}>
+                {isLoading1 ? "Logging in..." : "Submit"}
+              </Button>
     </div>
           </div>
         </CardContent>
