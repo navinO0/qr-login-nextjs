@@ -71,7 +71,7 @@ const CreateCustomerForm = () => {
         };
 
         try {
-            const response = await fetch(`${process.env.NEXT_PUBLIC_HOST || "http://127.0.0.1:3009"}/customer/create`, {
+            const response = await fetch(`${process.env.NEXT_PUBLIC_HOST || "http://127.0.0.1:3000"}/customer/create`, {
                 method: "POST",
                 headers: {
                     "Content-Type": "application/json",

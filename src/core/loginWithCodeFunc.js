@@ -16,9 +16,9 @@ const loginWithCodeFunc = async (loginCode) => {
     // const router = useRouter(); // Make sure to initialize router
 
     try {
-        const response = await fetch(`${process.env.NEXT_PUBLIC_HOST || "http://127.0.0.1:3009"}/user/login/code/${loginCode}`, {
+        const response = await fetch(`${process.env.NEXT_PUBLIC_HOST || "http://127.0.0.1:3000"}/user/login/code/${loginCode}`, {
             method: 'POST',
-            headers: {  
+            headers: {
                 'Accept': 'application/json',
             },
         });

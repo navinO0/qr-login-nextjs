@@ -58,7 +58,7 @@ export function QrWithAlert() {
         }
 
         try {
-            const response = await fetch(`${process.env.NEXT_PUBLIC_HOST || "http://127.0.0.1:3009"}/user/get/code`, {
+            const response = await fetch(`${process.env.NEXT_PUBLIC_HOST || "http://127.0.0.1:3000"}/user/get/code`, {
                 method: 'POST',
                 headers: {
                     'Accept': 'application/json',
@@ -171,7 +171,7 @@ export function QrWithAlert() {
                     <AlertDialogFooter>
                         {/* Show refresh button if timer has expired */}
                         {isTimerExpired && (
-                            <AlertDialogAction onClick={handleRefresh}>Refresh</AlertDialogAction>
+                            <Button onClick={handleRefresh}>Refresh</Button>
                         )}
                         <AlertDialogAction onClick={handleCloseModal}>Close</AlertDialogAction>
                     </AlertDialogFooter>

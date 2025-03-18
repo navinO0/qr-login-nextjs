@@ -93,7 +93,7 @@ const Register = () => {
         };
         try {
             // Send POST request to the API
-            const response = await fetch(`${process.env.NEXT_PUBLIC_HOST || "http://127.0.0.1:3009"}/user/public/create`, {
+            const response = await fetch(`${process.env.NEXT_PUBLIC_HOST || "http://127.0.0.1:3000"}/user/public/create`, {
                 method: 'POST',
                 headers: {
                     'Accept': 'application/json',

@@ -59,7 +59,7 @@ export function LoginForm({ className, ...props }) {
         router.push("/")
     }
     try {
-      const response = await fetch(`${process.env.NEXT_PUBLIC_HOST  || "http://127.0.0.1:3009"}/user/public/login`, {
+      const response = await fetch(`${process.env.NEXT_PUBLIC_HOST  || "http://127.0.0.1:3000"}/user/public/login`, {
         method: 'POST',
         headers: {
           'Accept': 'application/json',
