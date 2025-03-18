@@ -22,7 +22,7 @@ import {
     FormMessage,
 } from "../../components/ui/form";
 import { Input } from "@/components/ui/input";
-import { React , useState} from "react";
+import { React, useState } from "react";
 
 // Define form validation schema with new fields
 const formSchema = z.object({
@@ -93,7 +93,7 @@ const Register = () => {
         };
         try {
             // Send POST request to the API
-            const response = await fetch(`http://127.0.0.1:3009/user/public/create`, {
+            const response = await fetch(`${process.env.NEXT_PUBLIC_HOST || "http://127.0.0.1:3009"}/user/public/create`, {
                 method: 'POST',
                 headers: {
                     'Accept': 'application/json',
@@ -273,7 +273,7 @@ const Register = () => {
                                 </FormItem>
                             )}
                         />
-{/* 
+                        {/* 
                         <FormField
                             control={form.control}
                             name="address"
@@ -312,7 +312,7 @@ const Register = () => {
                                 </FormItem>
                             )}
                         /> */}
-{/* 
+                        {/* 
                         <FormField
                             control={form.control}
                             name="gender"

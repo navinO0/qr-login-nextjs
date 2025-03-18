@@ -1,15 +1,18 @@
+"use client"
 import React from 'react';
 import { useQRCode } from 'next-qrcode';
 import Link from 'next/link';
+
+
 
 function Qr_gen(props) {
     const { Canvas } = useQRCode();
     const { qr_link } = props
     const link = qr_link.link
     const code = qr_link.code
-    console.log(code)
+    // console.log(code)
     return (
-        <div className='popup-container'>
+        <span className='popup-container'>
         <Canvas
             text={link}
             options={{
@@ -23,9 +26,9 @@ function Qr_gen(props) {
                 },
             }}
             />
-            <h1>{code}</h1>
-            <h2>{link}</h2>
-        </div>
+            <span>{code}</span>
+            <span>{link}</span>
+        </span>
     );
 }
 

@@ -23,7 +23,7 @@ const PopupComponent = () => {
         }
 
         try {
-            const response = await fetch('http://127.0.0.1:3009/user/get/code', {
+            const response = await fetch(`${process.env.NEXT_PUBLIC_HOST || "http://127.0.0.1:3009"}/user/get/code`, {
                 method: 'POST',
                 headers: {
                     'Accept': 'application/json',
@@ -37,7 +37,7 @@ const PopupComponent = () => {
                 const resp = await response.json();
                 const loginCode = resp.data.code
                 console.log(loginCode)
-                if(!loginCode || loginCode === 'undefined') {
+                if (!loginCode || loginCode === 'undefined') {
                     setError('No login code found');
                     setIsLoading(false);
                     return;
@@ -78,7 +78,7 @@ const PopupComponent = () => {
                         ) : error ? (
                             <p>{error}</p>
                         ) : (
-                            qrLoginCode && <Qr_gen qr_link={{ link: `http://127.0.0.1:3009/user/login/code/${qrLoginCode}`, code : qrLoginCode }}  />
+                            qrLoginCode && <Qr_gen qr_link={{ link: `${process.env.NEXT_PUBLIC_HOST || "http://127.0.0.1:3009"}/user/login/code/${qrLoginCode}`, code: qrLoginCode }} />
                         )}
                     </div>
                     <div className="actions">

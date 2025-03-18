@@ -2,7 +2,6 @@
 
 import { useEffect, useState } from 'react';
 import { useParams, useRouter } from 'next/navigation'; // For navigation
-import Cookies from 'js-cookie'; // To handle cookies
 import loginWithCodeFunc from '@/core/loginWithCodeFunc';
 
 const LoginWithCode = () => {

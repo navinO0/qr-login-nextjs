@@ -1,3 +1,4 @@
+"use client"
 import {
     AlertDialog,
     AlertDialogAction,
@@ -10,13 +11,13 @@ import {
     AlertDialogTrigger,
 } from "@/components/ui/alert-dialog"
 import { Button } from "@/components/ui/button"
-import Cookies from "js-cookie"
+import clearToken from "@/core/removeToken"
 
 export function CloseAlert() {
-    const clearToken = () => {
-        Cookies.remove('jwt_token')
-        window.location.reload()
+    const clearTokenBtn = () => {
+        clearToken()
     }
+    
     return (
         <AlertDialog>
             <AlertDialogTrigger asChild>
@@ -31,7 +32,7 @@ export function CloseAlert() {
                 </AlertDialogHeader>
                 <AlertDialogFooter>
                     <AlertDialogCancel>Cancel</AlertDialogCancel>
-                    <AlertDialogAction onClick={clearToken}>Logout</AlertDialogAction>
+                    <AlertDialogAction onClick={clearTokenBtn}>Logout</AlertDialogAction>
                 </AlertDialogFooter>
             </AlertDialogContent>
         </AlertDialog>

@@ -262,7 +262,9 @@ padding : 20px
 .home-container {
   background-color:  #2A3132;
   background-size: cover;
-  height: 100vh;
+  min-height: 100vh;
+  height: auto;
+  margin-bottom: 20px;
 }
 
 /* #763626,
@@ -284,3 +286,22 @@ gap: 10px;
 
 
 /* ---------Home0-0-------- */
+
+
+
+
+/* --------- invoice starts------- */
+
+
+.invoice-container {
+  display: flex;
+  flex-direction: column;
+  align-items: flex-start;
+;
+  align-self: flex-start;
+  justify-content: flex-start;
+}
+
+
+
+/* ----------invoice ends------ */
