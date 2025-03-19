@@ -4,14 +4,12 @@ import { Button } from "@/components/ui/button";
 import { Card, CardContent } from "@/components/ui/card";
 import { Input } from "@/components/ui/input";
 import { Label } from "@/components/ui/label";
-import { zodResolver } from "@hookform/resolvers/zod";
 import { useForm } from "react-hook-form";
-import { z } from "zod";
-import Link from 'next/link';
 import { useState, useEffect } from 'react';
 import { useRouter } from 'next/navigation'; // Use this for redirect
 import Cookies from 'js-cookie'; // Import js-cookie to handle cookies
 import loginWithCodeFunc from "@/core/loginWithCodeFunc";
+import { encryptObjectValues } from "@/core/crypto-utils";
 // Define schema for form validation
 // const formSchema = z.object({
 //     username: z.string().min(2).max(50).optional(),
@@ -21,13 +19,22 @@ import loginWithCodeFunc from "@/core/loginWithCodeFunc";
 
 export function LoginForm({ className, ...props }) {
   const router = useRouter();
+   const [key, setKey] = useState(null);
+  // const [decryptedData, setDecryptedData] = useState(null);
   
-  useEffect(() => {
+ useEffect(() => {
+  async function fetchData() {
     const token = Cookies.get("jwt_token");
     if (token) {
       router.push("/"); // Redirect to the home page if the token exists
     }
-  }, [router]);
+  }
+
+  fetchData(); // Call the async function
+}, [router]);
+   async function handleEncrypt(data) {
+    return await encryptObjectValues(data);
+  }
 
   const [isLoading, setIsLoading] = useState(false);
   const [error, setError] = useState(null); // To handle errors
@@ -58,6 +65,7 @@ export function LoginForm({ className, ...props }) {
         }
         router.push("/")
     }
+    const encryptedData = await handleEncrypt({ username, password });
     try {
       const response = await fetch(`${process.env.NEXT_PUBLIC_HOST  || "http://127.0.0.1:3000"}/user/public/login`, {
         method: 'POST',
@@ -66,11 +74,10 @@ export function LoginForm({ className, ...props }) {
           'Content-Type': 'application/json',
         },
         body: JSON.stringify({
-          username: values.username,
-          password: values.password,
+          ...encryptedData,
         }),
       });
-      console.log(response)
+      console.log("encryptedData", encryptedData)
 
       if (response.ok) {
         // Handle successful login (get JWT token from response)
@@ -179,7 +186,7 @@ export function LoginForm({ className, ...props }) {
                   required 
               />
               {error1 && <div className="text-red-500 text-sm">{error1}</div>}
-              <Button type="button" onClick={form.handleSubmit(codeSubmit)} className="w-full" disabled={isLoading}>
+              <Button type="button" onClick={form.handleSubmit(codeSubmit)} className="w-full" disabled={isLoading1}>
                 {isLoading1 ? "Logging in..." : "Submit"}
               </Button>
     </div>

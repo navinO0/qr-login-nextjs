@@ -3,7 +3,6 @@
 import {
     AlertDialog,
     AlertDialogAction,
-    AlertDialogCancel,
     AlertDialogContent,
     AlertDialogDescription,
     AlertDialogFooter,
@@ -74,6 +73,7 @@ export function QrWithAlert() {
             if (response.ok) {
                 const resp = await response.json();
                 const loginCode = resp.data.code;
+                console.log(loginCode)
                 if (!loginCode || loginCode === 'undefined') {
                     setError('No login code found');
                     setIsLoading(false);
