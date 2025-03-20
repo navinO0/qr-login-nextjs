@@ -26,7 +26,7 @@ import HeaderProfile from "./headerProfile"
 
 const Header = () => {
     return (
-        <div className="header-component">
+        <div className="header-component w-full">
             <Menubar>
                 <MenubarMenu>
                     <MenubarTrigger>File</MenubarTrigger>

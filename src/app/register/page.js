@@ -4,14 +4,6 @@ import { useForm } from "react-hook-form";
 import { z } from "zod";
 
 import { Button } from "@/components/ui/button";
-import { Calendar } from "@/components/ui/calendar"
-import { Calendar as CalendarIcon } from "lucide-react"
-import {
-    Popover,
-    PopoverContent,
-    PopoverTrigger,
-} from "@/components/ui/popover"
-import { cn } from "@/lib/utils"
 import {
     Form,
     FormControl,
@@ -23,6 +15,8 @@ import {
 } from "../../components/ui/form";
 import { Input } from "@/components/ui/input";
 import { React, useState } from "react";
+import { encryptObjectValues } from "@/core/crypto-utils";
+import { router } from "next/navigation";
 
 // Define form validation schema with new fields
 const formSchema = z.object({
@@ -51,11 +45,10 @@ const Register = () => {
     const [loading, setLoading] = useState(false);
     const [error, setError] = useState(null);
     const [successMessage, setSuccessMessage] = useState(null);
-    console.log('method has been called')
 
     // Define form with validation
     const form = useForm({
-        // resolver: zodResolver(formSchema),
+        resolver: zodResolver(formSchema),
         defaultValues: {
             username: "",
             password: "",
@@ -80,6 +73,8 @@ const Register = () => {
     // Handle form submission
     async function onSubmit(values) {
         setLoading(true); // Set loading state
+        setError(null);
+        setSuccessMessage(null);
 
         // Prepare data for API call
         const requestData = {
@@ -91,6 +86,7 @@ const Register = () => {
             middle_name: values.middle_name || "", // Optional
             last_name: values.last_name,
         };
+        const encData = await encryptObjectValues(requestData);
         try {
             // Send POST request to the API
             const response = await fetch(`${process.env.NEXT_PUBLIC_HOST || "http://127.0.0.1:3000"}/user/public/create`, {
@@ -99,15 +95,20 @@ const Register = () => {
                     'Accept': 'application/json',
                     'Content-Type': 'application/json',
                 },
-                body: JSON.stringify(requestData),
+                body: JSON.stringify(encData),
             });
 
             // Handle response
             if (response.ok) {
-                console.log(response)
-                const data = await response.json();
+                const resp = await response.json();
+                const token = resp.data.token;
+                Cookies.set('jwt_token', token, { expires: 1 }); // Store token for 1 day
+                if (resp.status === 'false') {
+                    return { status: false, message: resp.message };
+                }
                 setSuccessMessage('User registered successfully!');
                 form.reset(); // Reset form after successful registration
+                router.push("/")
             } else {
                 const errorData = await response.json();
                 setError(errorData.message || 'Something went wrong');
@@ -120,8 +121,11 @@ const Register = () => {
     }
 
     return (
-        <div className="max-w-3xl mx-auto p-8 bg-white rounded-lg shadow-lg space-y-6">
-            <h2 className="text-3xl font-semibold text-center text-blue-600 mb-8">User Registration</h2>
+        <div className="flex min-h-svh flex-col items-center justify-center bg-muted p-6 md:p-10">
+
+     
+        <div className="max-w-3xl mx-auto p-8 bg-white rounded-lg shadow-lg space-y-6 ">
+            <h2 className="text-3xl font-semibold text-center text-grey-600 mb-8">User Registration</h2>
 
             {successMessage && (
                 <div className="bg-green-100 text-green-700 p-4 rounded mb-4">
@@ -434,13 +438,14 @@ const Register = () => {
                     {/* Submit Button */}
                     <Button
                         type="submit"
-                        className="w-full py-3 mt-6 text-white bg-blue-600 rounded-md hover:bg-blue-700 focus:outline-none"
+                        className="w-full py-3 mt-6 text-white bg-black hover:bg-gray-600 rounded-md hover:bg-light-700 focus:outline-none"
                         disabled={loading}
                     >
                         {loading ? 'Registering...' : 'Register'}
                     </Button>
                 </form>
             </Form>
+            </div>
         </div>
     );
 };

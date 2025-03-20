@@ -33,7 +33,6 @@ const loginWithCodeFunc = async (loginCode) => {
             return { status: true, message: 'login success' };
         } else {
             const errorData = await response.json();
-            console.log('Error:', errorData);
             return { status: false, message: errorData.message };
         }
     } catch (error) {
