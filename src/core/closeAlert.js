@@ -12,6 +12,7 @@ import {
 } from "@/components/ui/alert-dialog"
 import { Button } from "@/components/ui/button"
 import clearToken from "@/core/removeToken"
+import { MenubarTrigger } from "@radix-ui/react-menubar"
 
 export function CloseAlert() {
     const clearTokenBtn = () => {

@@ -15,12 +15,32 @@ import Cookies from "js-cookie"
 import React, { useState, useEffect, useCallback, useRef } from 'react';
 import Qr_gen from './qr_generator';
 import clearToken from "./removeToken";
+import os from "os";
 
-function getHost() {
+const QRTimerInMints = process.env.NEXT_PUBLIC_QR_TIMER || 1;
+
+function getHost(req = null) {
     if (typeof window !== "undefined") {
+        // Client-side: Get the protocol and hostname
         return `${window.location.protocol}//${window.location.host}`;
     } else {
-        return process.env.NEXT_PUBLIC_HOST || "http://localhost:3000";
+        // Server-side: Get VM IP
+        const networkInterfaces = os.networkInterfaces();
+        let vmIP = "127.0.0.1"; // Default localhost
+
+        // Loop through network interfaces to find the first valid non-internal IP
+        for (const interfaceKey in networkInterfaces) {
+            for (const net of networkInterfaces[interfaceKey]) {
+                if (!net.internal && net.family === "IPv4") {
+                    vmIP = net.address;
+                    break;
+                }
+            }
+        }
+
+        // If Next.js API request is provided, use request host
+        const host = req?.headers?.host || `${vmIP}:3000`;
+        return `http://${host}`;
     }
 }
 
@@ -28,9 +48,10 @@ export function QrWithAlert() {
     const [isLoading, setIsLoading] = useState(false);
     const [qrLoginCode, setQrLoginCode] = useState('');
     const [error, setError] = useState(null);
+    const [hostName, setHost] = useState(getHost());
 
     // Timer state
-    const [timeLeft, setTimeLeft] = useState(5 * 60); // 5 minutes in seconds
+    const [timeLeft, setTimeLeft] = useState(QRTimerInMints * 60); // 5 minutes in seconds
     const [isTimerExpired, setIsTimerExpired] = useState(false); // State to track if the timer has expired
 
     // Timer reference (to avoid global variable)
@@ -47,7 +68,7 @@ export function QrWithAlert() {
         const token = Cookies.get('jwt_token');
 
         // Reset the timer to 5 minutes (300 seconds) every time QR code is fetched
-        setTimeLeft(5 * 60); // 5 minutes in seconds
+        setTimeLeft(QRTimerInMints * 60); // 5 minutes in seconds
         setIsTimerExpired(false); // Reset timer expired flag
 
         if (!token || token === 'undefined') {
@@ -117,7 +138,7 @@ export function QrWithAlert() {
 
     // Handle refresh button click - reset timer to 5 minutes
     const handleRefresh = () => {
-        setTimeLeft(5 * 60); // Reset timer to 5 minutes
+        setTimeLeft(QRTimerInMints * 60); // Reset timer to 5 minutes
         setIsTimerExpired(false); // Reset expired flag
         fetchQrCode(); // Re-fetch QR code and start the timer again
     };
@@ -138,7 +159,10 @@ export function QrWithAlert() {
         <div>
             <AlertDialog>
                 <AlertDialogTrigger asChild>
-                    <p onClick={handleOpenModal}>Add device </p>
+                    <p onClick={handleOpenModal}><img
+                        alt="Tailwind CSS Navbar component"
+                        src="https://res.cloudinary.com/dzapdxkgc/image/upload/v1742564270/qrcode-scan-svgrepo-com_lcxjjd.svg"
+                        className="h-7" /> </p>
                 </AlertDialogTrigger>
                 <AlertDialogContent>
                     {/* Timer Display */}
@@ -163,7 +187,7 @@ export function QrWithAlert() {
                                 ) : error ? (
                                     <span>{error}</span>
                                 ) : (
-                                            qrLoginCode && <Qr_gen qr_link={{ link: `${process.env.NEXT_PUBLIC_HOST_QR || "http://192.168.112.190:3000"}/login/${qrLoginCode}`, code: qrLoginCode }} />
+                                            qrLoginCode && <Qr_gen qr_link={{ link: `${process.env.NEXT_PUBLIC_HOST_QR || hostName}/login/${qrLoginCode}`, code: qrLoginCode }} />
                                 )}
                             </span>
                         </AlertDialogDescription>

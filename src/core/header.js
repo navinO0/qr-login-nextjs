@@ -22,13 +22,14 @@ import Cookies from "js-cookie"
 import { CloseAlert } from "./closeAlert"
 import { QrWithAlert } from "./qrWithAlert"
 import HeaderProfile from "./headerProfile"
+import { Button } from "@/components/ui/button"
 
 
 const Header = () => {
     return (
-        <div className="header-component w-full">
-            <Menubar>
-                <MenubarMenu>
+        <div className=" ">
+            {/* <Menubar className="border-black w-full flec justify-end border-none shadow-none"> */}
+                {/* <MenubarMenu>
                     <MenubarTrigger>File</MenubarTrigger>
                     <MenubarContent>
                         <MenubarItem>
@@ -114,15 +115,77 @@ const Header = () => {
                         <MenubarItem inset> <PopupComponent /> </MenubarItem>
                         <MenubarItem inset> <span>spn btn</span> </MenubarItem>
                     </MenubarContent>
+                </MenubarMenu> */}
+                {/* <HeaderProfile />
+                <MenubarMenu>
+                    <MenubarTrigger>
+                        <QrWithAlert />
+                    </MenubarTrigger>
+                    
                 </MenubarMenu>
                 <MenubarMenu>
-                    <MenubarTrigger><QrWithAlert /></MenubarTrigger>
-                </MenubarMenu>
-            </Menubar>
-            <div className="header-profile">
-                <HeaderProfile />
-                <CloseAlert />
+                <MenubarTrigger>
+                    <CloseAlert />
+                </MenubarTrigger>
+                </MenubarMenu> */}
+                {/* <MenubarMenu>
+                    <MenubarTrigger>Profiles</MenubarTrigger>
+                    <MenubarContent>
+                        <MenubarRadioGroup value="benoit">
+                            <MenubarRadioItem value="andy">Andy</MenubarRadioItem>
+                            <MenubarRadioItem value="benoit">Benoit</MenubarRadioItem>
+                            <MenubarRadioItem value="Luis">Luis</MenubarRadioItem>
+                        </MenubarRadioGroup>
+                        <MenubarSeparator />
+                        <MenubarItem inset>Edit...</MenubarItem>
+                        <MenubarSeparator />
+                        <MenubarItem inset>Add Profile...</MenubarItem>
+                        <MenubarItem inset> <PopupComponent /> </MenubarItem>
+                        <MenubarItem inset> <Button ><CloseAlert /></Button> </MenubarItem>
+                    </MenubarContent>
+                </MenubarMenu> */}
+                
+            {/* </Menubar> */}
+
+            <div className=" ">
+                <div className="navbar bg-base-100 shadow-sm">
+                    <div className="flex-1">
+                        <a className="p-6"> <HeaderProfile /></a>
+                    </div>
+                    <div className="flex-none">
+                        <div className="dropdown dropdown-end">
+                            <div  className="btn btn-ghost btn-circle">
+                                <div className="indicator">
+                                    <QrWithAlert />
+                                    {/* <span className="badge badge-sm indicator-item">8</span> */}
+                                </div>
+                            </div>
+                        </div>
+                        <div className="dropdown dropdown-end">
+                            <div tabIndex={0} role="button" className="btn btn-ghost btn-circle avatar">
+                                <div className="w-10 rounded-full">
+                                    <img
+                                        alt="Tailwind CSS Navbar component"
+                                        src="https://img.daisyui.com/images/stock/photo-1534528741775-53994a69daeb.webp" />
+                                </div>
+                            </div>
+                            <ul
+                                tabIndex={0}
+                                className="menu menu-sm dropdown-content bg-base-100 rounded-box z-1 mt-3 w-52 p-2 shadow">
+                                <li>
+                                    <a className="justify-between">
+                                        Profile
+                                        <span className="badge">New</span>
+                                    </a>
+                                </li>
+                                <li><a>Settings</a></li>
+                                <li><CloseAlert /></li>
+                            </ul>
+                        </div>
+                    </div>
+                </div>
             </div>
+            
             
         </div>
     )
