@@ -17,6 +17,7 @@ import Qr_gen from './qr_generator';
 import clearToken from "./removeToken";
 import os from "os";
 import QrLoader from "./qrLoader";
+import ErroToaster from "./errorToaster";
 
 const QRTimerInMints = process.env.NEXT_PUBLIC_QR_TIMER || 1;
 
@@ -73,7 +74,6 @@ export function QrWithAlert() {
         setIsTimerExpired(false); // Reset timer expired flag
 
         if (!token || token === 'undefined') {
-            setError('No token found');
             setIsLoading(false);
             return;
         }
@@ -177,7 +177,7 @@ export function QrWithAlert() {
                                 {isLoading ? (
                                     <QrLoader />
                                 ) : error ? (
-                                    <span>{error}</span>
+                                    <ErroToaster message={error} />
                                 ) : (
                                             qrLoginCode && <Qr_gen qr_link={{ link: `${process.env.NEXT_PUBLIC_HOST_QR || hostName}/login/${qrLoginCode}`, code: qrLoginCode, time: timeLeft }} />
                                 )}

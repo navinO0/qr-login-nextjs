@@ -24,7 +24,7 @@ const LoginWithCode = () => {
 
     const onSubmit = async () => {
         if (!loginCode) {
-            console.log("Login code not available");
+
             return;
         }
         setIsLoading(true);

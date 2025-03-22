@@ -21,8 +21,6 @@ import ErroToaster from "@/core/errorToaster";
 
 export function LoginForm({ className, ...props }) {
   const router = useRouter();
-   const [key, setKey] = useState(null);
-  // const [decryptedData, setDecryptedData] = useState(null);
   
  useEffect(() => {
   async function fetchData() {
@@ -61,7 +59,6 @@ export function LoginForm({ className, ...props }) {
     const { loginCode, username, password } = values;
     if (loginCode) {
       const logi = await loginWithCodeFunc(loginCode);
-      console.log(logi)
         if (logi !== true) {
             setError1(logi)
         }
@@ -79,7 +76,6 @@ export function LoginForm({ className, ...props }) {
           ...encryptedData,
         }),
       });
-      console.log("encryptedData", encryptedData)
 
       if (response.ok) {
         // Handle successful login (get JWT token from response)
@@ -152,9 +148,9 @@ export function LoginForm({ className, ...props }) {
               <div className="grid gap-3">
                 <div className="flex items-center">
                   <Label htmlFor="password">Password</Label>
-                  <a href="#" className="ml-auto text-sm underline-offset-2 hover:underline">
+                  {/* <a href="#" className="ml-auto text-sm underline-offset-2 hover:underline">
                     Forgot your password?
-                  </a>
+                  </a> */}
                 </div>
                 <Input 
                   id="password" 

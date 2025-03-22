@@ -1,16 +1,6 @@
 "use client"
-import { Button } from "@/components/ui/button";
-import { Toaster } from "@/components/ui/sonner";
-import ErroToaster from "@/core/errorToaster";
-
-import { toast } from "sonner"
 
 const FavItems = () => {
-    const triggerToast = () => {
-        console.log("clicked")
-        return <ErroToaster/>
-       
-    };
     return <div className="flex justify-center align-center vh-screen vw-screen h-screen w-screen "><div> <button className="button-among-us">
       
     <svg

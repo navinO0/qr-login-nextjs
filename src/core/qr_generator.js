@@ -16,13 +16,9 @@ function Qr_gen(props) {
         const secs = seconds % 60;
         return `${String(minutes).padStart(2, '0')}:${String(secs).padStart(2, '0')}`;
     };
-    // console.log(code)
     return (
         <span className='popup-container'>
             <div style={{
-                        // position: 'fixed',
-                        // top: '10px',
-                        // right: '10px',
                 backgroundColor: 'rgba(0, 0, 0, 0.73)',
                 opacity : 0.8,
                         color: 'white',

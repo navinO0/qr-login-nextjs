@@ -39,8 +39,6 @@ const loginWithCodeFunc = async (loginCode) => {
         console.error('Login failed:', error);
         return { status: false, message: "login failed" };
 
-    } finally {
-        console.log('Login finished');
     }
 };
 

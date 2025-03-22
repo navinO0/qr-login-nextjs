@@ -92,7 +92,6 @@ const Register = () => {
             reader.readAsDataURL(file);
             reader.onload = () => {
                 setProfilePicture(reader.result);
-                console.log(reader.result);
             };
         }
     };
@@ -128,9 +127,6 @@ const Register = () => {
                 body: JSON.stringify(encData),
             });
     
-            // Log response status for debugging
-            console.log("Response status:", response.status);
-    
             // Ensure response is valid JSON
             const resp = await response.json();
     
@@ -143,7 +139,6 @@ const Register = () => {
                     return { status: false, message: resp.message };
                 }
     
-                console.log("Token received:", token);
                 Cookies.set('jwt_token', token, { expires: 1 }); // Store token for 1 day
                 setSuccessMessage('User registered successfully!');
                 router.push("/");

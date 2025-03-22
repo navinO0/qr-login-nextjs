@@ -28,7 +28,6 @@ const TenantFormCard = () => {
     const handleSubmit = async (e) => {
         e.preventDefault();
         // Make your API call to submit the data
-        console.log("Form submitted with data: ", formData);
         // Add your API call logic here...
     };
 

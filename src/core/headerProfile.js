@@ -20,7 +20,6 @@ const Base64ImageDisplay = () => {
 
         const token = Cookies.get('jwt_token');
                if (!token || token === 'undefined') {
-                   setError('No token found');
                    setIsLoading(false);
                    return;
                }

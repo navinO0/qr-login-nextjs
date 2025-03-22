@@ -5,6 +5,7 @@ import Popup from 'reactjs-popup';
 import 'reactjs-popup/dist/index.css';
 import Qr_gen from './qr_generator';
 import Cookies from 'js-cookie'; // Assuming you are using 'js-cookie' for cookie management
+import ErroToaster from './errorToaster';
 
 const PopupComponent = () => {
     const [isLoading, setIsLoading] = useState(false);
@@ -17,7 +18,6 @@ const PopupComponent = () => {
         const token = Cookies.get('jwt_token');
 
         if (!token || token === 'undefined') {
-            setError('No token found');
             setIsLoading(false);
             return;
         }
@@ -36,7 +36,6 @@ const PopupComponent = () => {
             if (response.ok) {
                 const resp = await response.json();
                 const loginCode = resp.data.code
-                console.log(loginCode)
                 if (!loginCode || loginCode === 'undefined') {
                     setError('No login code found');
                     setIsLoading(false);
@@ -76,7 +75,7 @@ const PopupComponent = () => {
                         {isLoading ? (
                             <p>Loading...</p>
                         ) : error ? (
-                            <p>{error}</p>
+                            <ErroToaster message={error} />
                         ) : (
                             qrLoginCode && <Qr_gen qr_link={{ link: `${process.env.NEXT_PUBLIC_HOST || "http://127.0.0.1:3000"}/user/login/code/${qrLoginCode}`, code: qrLoginCode }} />
                         )}
@@ -92,7 +91,6 @@ const PopupComponent = () => {
                         <button
                             className="button"
                             onClick={() => {
-                                console.log('modal closed');
                                 close();
                             }}
                         >
