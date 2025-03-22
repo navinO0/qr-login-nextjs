@@ -63,8 +63,8 @@ const Register = () => {
             email: "",
             mobile: "",
             first_name: "",
-            middle_name: "",
-            last_name: "",
+            // middle_name: "",
+            // last_name: "",
             profile_picture: z.optional(),
             // address: "",
             // dob: "",
@@ -155,6 +155,9 @@ const Register = () => {
         } finally {
             setLoading(false); // Reset loading state
         }
+    }
+    const redirectToLogin = () => {
+        router.push("/login");
     }
     
 
@@ -331,174 +334,26 @@ const Register = () => {
                                 )}
                                 
                         />
-                        {/* 
-                        <FormField
-                            control={form.control}
-                            name="address"
-                            render={({ field }) => (
-                                <FormItem>
-                                    <FormLabel>Address</FormLabel>
-                                    <FormControl>
-                                        <Input
-                                            placeholder="Address"
-                                            className="w-full p-3 border border-gray-300 rounded-md focus:outline-none focus:ring-2 focus:ring-blue-500"
-                                            {...field}
-                                        />
-                                    </FormControl>
-                                    <FormMessage />
-                                </FormItem>
-                            )}
-                        /> */}
                     </div>
 
-                    {/* Date of Birth and Gender Fields */}
-                    <div className="grid grid-cols-1 sm:grid-cols-2 gap-6">
-                        {/* <FormField
-                            control={form.control}
-                            name="dob"
-                            render={({ field }) => (
-                                <FormItem>
-                                    <FormLabel>Date of Birth</FormLabel>
-                                    <FormControl>
-                                        <Input
-                                            type="date"
-                                            className="w-full p-3 border border-gray-300 rounded-md focus:outline-none focus:ring-2 focus:ring-blue-500"
-                                            {...field}
-                                        />
-                                    </FormControl>
-                                    <FormMessage />
-                                </FormItem>
-                            )}
-                        /> */}
-                        {/* 
-                        <FormField
-                            control={form.control}
-                            name="gender"
-                            render={({ field }) => (
-                                <FormItem>
-                                    <FormLabel>Gender</FormLabel>
-                                    <FormControl>
-                                        <select
-                                            className="w-full p-3 border border-gray-300 rounded-md focus:outline-none focus:ring-2 focus:ring-blue-500"
-                                            {...field}
-                                        >
-                                            <option value="Male">Male</option>
-                                            <option value="Female">Female</option>
-                                            <option value="Other">Other</option>
-                                        </select>
-                                    </FormControl>
-                                    <FormMessage />
-                                </FormItem>
-                            )}
-                        /> */}
-                    </div>
-
-                    {/* Country, City and Postal Code Fields */}
-                    <div className="grid grid-cols-1 sm:grid-cols-2 gap-6">
-                        {/* <FormField
-                            control={form.control}
-                            name="country"
-                            render={({ field }) => (
-                                <FormItem>
-                                    <FormLabel>Country</FormLabel>
-                                    <FormControl>
-                                        <Input
-                                            placeholder="Country"
-                                            className="w-full p-3 border border-gray-300 rounded-md focus:outline-none focus:ring-2 focus:ring-blue-500"
-                                            {...field}
-                                        />
-                                    </FormControl>
-                                    <FormMessage />
-                                </FormItem>
-                            )}
-                        /> */}
-
-                        {/* <FormField
-                            control={form.control}
-                            name="city"
-                            render={({ field }) => (
-                                <FormItem>
-                                    <FormLabel>City</FormLabel>
-                                    <FormControl>
-                                        <Input
-                                            placeholder="City"
-                                            className="w-full p-3 border border-gray-300 rounded-md focus:outline-none focus:ring-2 focus:ring-blue-500"
-                                            {...field}
-                                        />
-                                    </FormControl>
-                                    <FormMessage />
-                                </FormItem>
-                            )}
-                        /> */}
-                    </div>
-
-                    <div className="grid grid-cols-1 sm:grid-cols-2 gap-6">
-                        {/* <FormField
-                            control={form.control}
-                            name="postal_code"
-                            render={({ field }) => (
-                                <FormItem>
-                                    <FormLabel>Postal Code</FormLabel>
-                                    <FormControl>
-                                        <Input
-                                            placeholder="Postal Code"
-                                            className="w-full p-3 border border-gray-300 rounded-md focus:outline-none focus:ring-2 focus:ring-blue-500"
-                                            {...field}
-                                        />
-                                    </FormControl>
-                                    <FormMessage />
-                                </FormItem>
-                            )}
-                        /> */}
-                    </div>
-
-                    {/* Newsletter and Terms Acceptance */}
-                    <div className="flex items-center space-x-4">
-                        {/* <FormField
-                            control={form.control}
-                            name="newsletter_subscribed"
-                            render={({ field }) => (
-                                <FormItem>
-                                    <FormLabel>Subscribe to Newsletter</FormLabel>
-                                    <FormControl>
-                                        <input
-                                            type="checkbox"
-                                            className="h-5 w-5"
-                                            {...field}
-                                        />
-                                    </FormControl>
-                                </FormItem>
-                            )}
-                        /> */}
-
-                        {/* <FormField
-                            control={form.control}
-                            name="terms_accepted"
-                            render={({ field }) => (
-                                <FormItem>
-                                    <FormLabel>Accept Terms</FormLabel>
-                                    <FormControl>
-                                        <input
-                                            type="checkbox"
-                                            className="h-5 w-5"
-                                            {...field}
-                                        />
-                                    </FormControl>
-                                </FormItem>
-                            )}
-                        /> */}
-                    </div>
+                   
 
                     {/* Submit Button */}
                     <Button
                         type="submit"
-                        className="w-full py-3 mt-6 text-white bg-black hover:bg-gray-600 rounded-md hover:bg-light-700 focus:outline-none"
+                        className="w-full py-3 mt-6 text-white bg-black hover:bg-gray-600 rounded-md hover:bg-light-700 focus:outline-none cursor-pointer"
                         disabled={loading}
                     >
                         {loading ? 'Registering...' : 'Register'}
-                    </Button>
+                        </Button>
                 </form>
-            </Form>
+                </Form>
+                <Button
+                            className="w-full py-3 mt-0 text-white bg-black hover:bg-gray-600 rounded-md hover:bg-light-700 focus:outline-none cursor-pointer"
+                            onClick = {redirectToLogin}
+                    >
+                        Registered already? Login
+                    </Button>
             </div>
         </div>
     );

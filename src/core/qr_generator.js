@@ -10,9 +10,28 @@ function Qr_gen(props) {
     const { qr_link } = props
     const link = qr_link.link
     const code = qr_link.code
+    const timeLeft = qr_link.time
+    const formatTimeLeft = (seconds) => {
+        const minutes = Math.floor(seconds / 60);
+        const secs = seconds % 60;
+        return `${String(minutes).padStart(2, '0')}:${String(secs).padStart(2, '0')}`;
+    };
     // console.log(code)
     return (
         <span className='popup-container'>
+            <div style={{
+                        // position: 'fixed',
+                        // top: '10px',
+                        // right: '10px',
+                backgroundColor: 'rgba(0, 0, 0, 0.73)',
+                opacity : 0.8,
+                        color: 'white',
+                        padding: '5px 10px',
+                        borderRadius: '5px',
+                        fontSize: '14px',
+                    }}>
+                        Expires in: {formatTimeLeft(timeLeft)}
+                    </div>
         <Canvas
             text={link}
             options={{

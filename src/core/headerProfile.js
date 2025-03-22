@@ -84,11 +84,12 @@ const Base64ImageDisplay = () => {
                     (
                         <div className="dropdown dropdown-end h-screen w-screen flex items-center justify-center flex-col">
                         <div className="w-30 rounded-full">
-                                                        <img
+                        <img
                                 src={imageSrc ? imageSrc : "https://res.cloudinary.com/dzapdxkgc/image/upload/v1742595352/download_ykpnl5.png"}
                                 alt="Profile Image"
-                                className=" object-cover rounded-full border"
-                                />
+                                className="w-30 h-30 object-cover rounded-full border-2 border-gray-300"
+                            />
+
                                 
                             </div>
                             <span className="text-lg  text-gray-900 font-serif font-semibold font-sans ">

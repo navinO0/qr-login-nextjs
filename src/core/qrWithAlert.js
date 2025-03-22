@@ -16,6 +16,7 @@ import React, { useState, useEffect, useCallback, useRef } from 'react';
 import Qr_gen from './qr_generator';
 import clearToken from "./removeToken";
 import os from "os";
+import QrLoader from "./qrLoader";
 
 const QRTimerInMints = process.env.NEXT_PUBLIC_QR_TIMER || 1;
 
@@ -157,36 +158,28 @@ export function QrWithAlert() {
     return (
         <div>
             <AlertDialog>
-                <AlertDialogTrigger asChild>
-                    <p onClick={handleOpenModal} className="cursor-pointer flex justify-between align-center "><span>Scan to add device</span><img
-                        alt="Tailwind CSS Navbar component"
+            <AlertDialogTrigger asChild>
+                <span onClick={handleOpenModal} className="cursor-pointer flex items-center justify-center space-x-2">
+                    <span className="hidden md:inline">Scan to add device</span>
+                    <img
+                        alt="Scan QR Code"
                         src="https://res.cloudinary.com/dzapdxkgc/image/upload/v1742564270/qrcode-scan-svgrepo-com_lcxjjd.svg"
-                        className="h-4 w-4 ml-2 " /> </p>
-                </AlertDialogTrigger>
+                        className="h-7 w-7"
+                    />
+                </span>
+            </AlertDialogTrigger>
                 <AlertDialogContent>
                     {/* Timer Display */}
-                    <div style={{
-                        position: 'fixed',
-                        top: '10px',
-                        right: '10px',
-                        backgroundColor: 'rgba(0, 0, 0, 0.7)',
-                        color: 'white',
-                        padding: '5px 10px',
-                        borderRadius: '5px',
-                        fontSize: '14px',
-                    }}>
-                        Expires in: {formatTimeLeft(timeLeft)}
-                    </div>
                     <AlertDialogHeader>
                         <AlertDialogTitle>Scan to add device</AlertDialogTitle>
                         <AlertDialogDescription>
-                            <span className="content">
+                            <span className="content w-full h-full flex flex-col items-center justify-center">
                                 {isLoading ? (
-                                    <span>Loading...</span>
+                                    <QrLoader />
                                 ) : error ? (
                                     <span>{error}</span>
                                 ) : (
-                                            qrLoginCode && <Qr_gen qr_link={{ link: `${process.env.NEXT_PUBLIC_HOST_QR || hostName}/login/${qrLoginCode}`, code: qrLoginCode }} />
+                                            qrLoginCode && <Qr_gen qr_link={{ link: `${process.env.NEXT_PUBLIC_HOST_QR || hostName}/login/${qrLoginCode}`, code: qrLoginCode, time: timeLeft }} />
                                 )}
                             </span>
                         </AlertDialogDescription>
