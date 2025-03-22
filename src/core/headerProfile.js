@@ -75,31 +75,19 @@ const Base64ImageDisplay = () => {
                 "Loading..."
             ) : (
                     (
-                        <div className="dropdown dropdown-end">
-                            <span className="text-lg  text-gray-900 font-serif font-semibold font-sans ">
-                           <span className="font-bold font-serif font-semibold font-sans font-mono fs-8 text-#000">Hello, </span > {`${userData.first_name || ''} ${userData.middle_name || ''} ${userData.last_name || ''}`.trim()}
-                        </span>
-                                                    <div tabIndex={0} role="button" className="btn btn-ghost btn-circle avatar">
-                                                        <div className="w-10 rounded-full">
+                        <div className="dropdown dropdown-end h-screen w-screen flex items-center justify-center flex-col">
+                        <div className="w-30 rounded-full">
                                                         <img
                                 src={imageSrc ? imageSrc : "https://res.cloudinary.com/dzapdxkgc/image/upload/v1742595352/download_ykpnl5.png"}
                                 alt="Profile Image"
-                                className="w-15 h-15 object-cover rounded-full border"
-                            />
-                                                        </div>
+                                className=" object-cover rounded-full border"
+                                />
+                                
+                            </div>
+                            <span className="text-lg  text-gray-900 font-serif font-semibold font-sans ">
+                           <span className="font-bold font-serif font-semibold font-sans font-mono fs-8 text-#000">Hello, </span > {`${userData.first_name || ''} ${userData.middle_name || ''} ${userData.last_name || ''}`.trim()}
+                        </span>
                                                     </div>
-                                                    <ul
-                                                        tabIndex={0}
-                                                        className="menu menu-sm dropdown-content bg-base-100 rounded-box z-1 mt-3 w-52 p-2 shadow">
-                                                        {/* <li>
-                                                            <a className="justify-between">
-                                                                Profile
-                                                                <span className="badge">New</span>
-                                                            </a>
-                                                        </li> */}
-                                                        <li><CloseAlert /></li>
-                                                    </ul>
-                                                </div>
                     //     <div className="flex items-center gap-4 border-none border-gray-300 p-2 rounded-lg">
                             
                             

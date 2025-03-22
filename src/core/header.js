@@ -35,7 +35,7 @@ const Header = () => {
                     </MenubarTrigger>
                 </MenubarMenu>
                 <MenubarMenu>
-                     <HeaderProfile />
+                     <CloseAlert />
                 </MenubarMenu>
             </Menubar>
 

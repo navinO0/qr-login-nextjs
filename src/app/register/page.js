@@ -28,6 +28,12 @@ const formSchema = z.object({
     first_name: z.string().min(1),
     middle_name: z.string().optional(),
     last_name: z.string().min(1),
+    // profile_picture: z
+    //     .instanceof(File) // Ensure it's a File object
+    //     .optional()
+    //     .refine((file) => !file || file.size <= 2 * 1024 * 1024, {
+    //         message: "Profile picture must be 2MB or smaller",
+    //     }),
     // address: z.string().min(5),
     // dob: z.string().min(10),
     // gender: z.enum(["Male", "Female", "Other"]),
@@ -59,7 +65,7 @@ const Register = () => {
             first_name: "",
             middle_name: "",
             last_name: "",
-            profile_picture: z.instanceof(File).optional(),
+            profile_picture: z.optional(),
             // address: "",
             // dob: "",
             // gender: "Male",
@@ -77,8 +83,8 @@ const Register = () => {
         const file = event.target.files[0];
         
         if (file) {
-            if (file.size > 1024 * 1024) { // 1MB = 1024 * 1024 bytes
-                console.log("File size must be less than 1MB");
+            if (file.size > ((1024 * 1024)*2)) { // 1MB = 1024 * 1024 bytes
+                setError("File size must be less than 2MB");
                 return;
             }
     
@@ -127,7 +133,6 @@ const Register = () => {
     
             // Ensure response is valid JSON
             const resp = await response.json();
-            console.log("Response JSON:", resp);
     
             // Handle response
             if (response.ok) {
@@ -319,7 +324,8 @@ const Register = () => {
                                 <FormLabel>Profile Picture</FormLabel>
                                 <FormControl>
                                     <Input type="file" accept="image/*" onChange={handleFileChange} />
-                                </FormControl>
+                                    </FormControl>
+                                    <FormLabel className={"text-grey-500 margin-top-0 opacity-50"}>*Image size should not ecxceed 2MB</FormLabel>
                                 <FormMessage />
                             </FormItem>
                                 )}
