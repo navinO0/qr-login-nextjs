@@ -5,6 +5,8 @@ import clearToken from "./removeToken";
 import parseToken from "./parseJson";
 import { CloseAlert } from "./closeAlert";
 import { QrWithAlert } from "./qrWithAlert";
+import MiniLoader from "./miniLoader";
+import Loader from "./loader";
 
 const Base64ImageDisplay = () => {
     const [imageSrc, setImageSrc] = useState(null);
@@ -70,9 +72,14 @@ const Base64ImageDisplay = () => {
 
     return (
         <div className="flex flex-col items-center gap-4">
-            {error && <p className="text-red-500">{error}</p>}
+            {error &&
+                <div className="dropdown dropdown-end h-screen w-screen flex items-center justify-center flex-col">
+                    <p className="text-red-500">{error}</p>
+                    </div>}
             {isLoading ? (
-                "Loading..."
+                <div className="dropdown dropdown-end h-screen w-screen flex items-center justify-center flex-col">
+                <Loader />
+                </div>
             ) : (
                     (
                         <div className="dropdown dropdown-end h-screen w-screen flex items-center justify-center flex-col">

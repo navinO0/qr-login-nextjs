@@ -10,6 +10,8 @@ import { useRouter } from 'next/navigation'; // Use this for redirect
 import Cookies from 'js-cookie'; // Import js-cookie to handle cookies
 import loginWithCodeFunc from "@/core/loginWithCodeFunc";
 import { encryptObjectValues } from "@/core/crypto-utils";
+import MiniLoader from "@/core/miniLoader";
+import ErroToaster from "@/core/errorToaster";
 // Define schema for form validation
 // const formSchema = z.object({
 //     username: z.string().min(2).max(50).optional(),
@@ -162,10 +164,10 @@ export function LoginForm({ className, ...props }) {
                   required 
                 />
               </div>
-              {error && <div className="text-red-500 text-sm">{error}</div>}
               <Button type="submit" className="w-full" disabled={isLoading}>
-                {isLoading ? "Logging in..." : "Login"}
+                {isLoading ? <MiniLoader /> : "Login"}
               </Button>
+              <ErroToaster message={error} />
               <div className="text-center text-sm">
                 Don&apos;t have an account?{" "}
                 <a href="/register" className="underline underline-offset-4">
@@ -185,10 +187,11 @@ export function LoginForm({ className, ...props }) {
                   {...form.register("loginCode")} 
                   required 
               />
-              {error1 && <div className="text-red-500 text-sm">{error1}</div>}
+              
               <Button type="button" onClick={form.handleSubmit(codeSubmit)} className="w-full" disabled={isLoading1}>
-                {isLoading1 ? "Logging in..." : "Submit"}
+                {isLoading1 ? <MiniLoader /> : "Submit"}
               </Button>
+              <ErroToaster message={error1} />
     </div>
           </div>
         </CardContent>

@@ -2,6 +2,7 @@
 import useProtectedRoute from "@/core/protectedRoute";
 import Header from "@/core/header";
 import HeaderProfile from "@/core/headerProfile";
+import ErroToaster from "@/core/errorToaster";
 
 
 
@@ -16,9 +17,11 @@ export default function Home() {
     <div className="">
       <Header />
       <div className="flex justify-center align-center vw-100 h-screen">
-      <HeaderProfile />
+        <HeaderProfile />
+        <ErroToaster/>
       </div>
-      
+      <div>
+      </div>
     </div>
   );
 }
