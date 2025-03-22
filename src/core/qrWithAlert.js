@@ -159,10 +159,10 @@ export function QrWithAlert() {
         <div>
             <AlertDialog>
                 <AlertDialogTrigger asChild>
-                    <p onClick={handleOpenModal}><img
+                    <p onClick={handleOpenModal} className="cursor-pointer flex justify-between align-center "><span>Scan to add device</span><img
                         alt="Tailwind CSS Navbar component"
                         src="https://res.cloudinary.com/dzapdxkgc/image/upload/v1742564270/qrcode-scan-svgrepo-com_lcxjjd.svg"
-                        className="h-7" /> </p>
+                        className="h-4 w-4 ml-2 " /> </p>
                 </AlertDialogTrigger>
                 <AlertDialogContent>
                     {/* Timer Display */}

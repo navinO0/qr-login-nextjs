@@ -7,7 +7,7 @@ function hexToUint8Array(hex) {
 }
 
 // Encrypt object values with IV and authentication tag
-async function encryptObjectValues(obj) {
+async function encryptObjectValues(obj, enc_keys) {
     const keyBuffer = hexToUint8Array(KEY_HEX);
     const key = await crypto.subtle.importKey(
         "raw",
@@ -20,23 +20,28 @@ async function encryptObjectValues(obj) {
     const encryptedObject = {};
 
     for (const [keyName, value] of Object.entries(obj)) {
-        const ivBuffer = crypto.getRandomValues(new Uint8Array(12)); 
-        const encodedValue = new TextEncoder().encode(String(value));
+        if (enc_keys.includes(keyName)) {
+            const ivBuffer = crypto.getRandomValues(new Uint8Array(12));
+            const encodedValue = new TextEncoder().encode(String(value));
 
-        const encryptedBuffer = await crypto.subtle.encrypt(
-            { name: "AES-GCM", iv: ivBuffer },
-            key,
-            encodedValue
-        );
+            const encryptedBuffer = await crypto.subtle.encrypt(
+                { name: "AES-GCM", iv: ivBuffer },
+                key,
+                encodedValue
+            );
 
-        // Convert encrypted data to Uint8Array
-        const encryptedData = new Uint8Array(encryptedBuffer);
+            // Convert encrypted data to Uint8Array
+            const encryptedData = new Uint8Array(encryptedBuffer);
 
-        // Convert IV + encrypted data to Base64
-        const ivBase64 = Buffer.from(ivBuffer).toString("base64");
-        const encryptedBase64 = Buffer.from(encryptedData).toString("base64");
+            // Convert IV + encrypted data to Base64
+            const ivBase64 = Buffer.from(ivBuffer).toString("base64");
+            const encryptedBase64 = Buffer.from(encryptedData).toString("base64");
 
-        encryptedObject[keyName] = `${ivBase64}:${encryptedBase64}`; // Store IV and encrypted data
+            encryptedObject[keyName] = `${ivBase64}:${encryptedBase64}`; // Store IV and encrypted data
+        }
+        else {
+            encryptedObject[keyName] = value;
+        }
     }
 
     return encryptedObject;

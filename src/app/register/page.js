@@ -16,7 +16,8 @@ import {
 import { Input } from "@/components/ui/input";
 import { React, useState } from "react";
 import { encryptObjectValues } from "@/core/crypto-utils";
-import { router } from "next/navigation";
+import { router, useRouter } from "next/navigation";
+import Cookies from "js-cookie";
 
 // Define form validation schema with new fields
 const formSchema = z.object({
@@ -45,6 +46,7 @@ const Register = () => {
     const [loading, setLoading] = useState(false);
     const [error, setError] = useState(null);
     const [successMessage, setSuccessMessage] = useState(null);
+    const [profilePicture, setProfilePicture] = useState(null)
 
     // Define form with validation
     const form = useForm({
@@ -57,6 +59,7 @@ const Register = () => {
             first_name: "",
             middle_name: "",
             last_name: "",
+            profile_picture: z.instanceof(File).optional(),
             // address: "",
             // dob: "",
             // gender: "Male",
@@ -70,12 +73,30 @@ const Register = () => {
         },
     });
 
+    const handleFileChange = (event) => {
+        const file = event.target.files[0];
+        
+        if (file) {
+            if (file.size > 1024 * 1024) { // 1MB = 1024 * 1024 bytes
+                console.log("File size must be less than 1MB");
+                return;
+            }
+    
+            const reader = new FileReader();
+            reader.readAsDataURL(file);
+            reader.onload = () => {
+                setProfilePicture(reader.result);
+                console.log(reader.result);
+            };
+        }
+    };
+    const router = useRouter();
+
     // Handle form submission
     async function onSubmit(values) {
         setLoading(true); // Set loading state
         setError(null);
         setSuccessMessage(null);
-
         // Prepare data for API call
         const requestData = {
             username: values.username,
@@ -85,8 +106,11 @@ const Register = () => {
             first_name: values.first_name,
             middle_name: values.middle_name || "", // Optional
             last_name: values.last_name,
+            profile_photo: profilePicture
         };
-        const encData = await encryptObjectValues(requestData);
+    
+        const encData = await encryptObjectValues(requestData, ['username', 'email', 'mobile', 'first_name', 'middle_name', "password", 'last_name']);
+    
         try {
             // Send POST request to the API
             const response = await fetch(`${process.env.NEXT_PUBLIC_HOST || "http://127.0.0.1:3000"}/user/public/create`, {
@@ -97,28 +121,37 @@ const Register = () => {
                 },
                 body: JSON.stringify(encData),
             });
-
+    
+            // Log response status for debugging
+            console.log("Response status:", response.status);
+    
+            // Ensure response is valid JSON
+            const resp = await response.json();
+            console.log("Response JSON:", resp);
+    
             // Handle response
             if (response.ok) {
-                const resp = await response.json();
-                const token = resp.data.token;
-                Cookies.set('jwt_token', token, { expires: 1 }); // Store token for 1 day
-                if (resp.status === 'false') {
+                const token = resp?.data?.token;
+    
+                if (!token || token === "undefined") {
+                    setError(resp.message || "Invalid token received");
                     return { status: false, message: resp.message };
                 }
+    
+                console.log("Token received:", token);
+                Cookies.set('jwt_token', token, { expires: 1 }); // Store token for 1 day
                 setSuccessMessage('User registered successfully!');
-                form.reset(); // Reset form after successful registration
-                router.push("/")
+                router.push("/");
             } else {
-                const errorData = await response.json();
-                setError(errorData.message || 'Something went wrong');
+                setError(resp.message || 'Something went wrong');
             }
         } catch (error) {
-            setError('An error occurred while trying to register');
+            setError(`An error occurred while trying to register: ${error.message || error}`);
         } finally {
             setLoading(false); // Reset loading state
         }
     }
+    
 
     return (
         <div className="flex min-h-svh flex-col items-center justify-center bg-muted p-6 md:p-10">
@@ -275,7 +308,22 @@ const Register = () => {
                                     </FormControl>
                                     <FormMessage />
                                 </FormItem>
-                            )}
+                                )}
+                                
+                            />
+                            <FormField
+                            control={form.control}
+                            name="last_name"
+                            render={({ field }) => (
+                                <FormItem>
+                                <FormLabel>Profile Picture</FormLabel>
+                                <FormControl>
+                                    <Input type="file" accept="image/*" onChange={handleFileChange} />
+                                </FormControl>
+                                <FormMessage />
+                            </FormItem>
+                                )}
+                                
                         />
                         {/* 
                         <FormField

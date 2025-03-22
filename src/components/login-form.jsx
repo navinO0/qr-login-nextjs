@@ -33,7 +33,7 @@ export function LoginForm({ className, ...props }) {
   fetchData(); // Call the async function
 }, [router]);
    async function handleEncrypt(data) {
-    return await encryptObjectValues(data);
+    return await encryptObjectValues(data,['username','password']);
   }
 
   const [isLoading, setIsLoading] = useState(false);
@@ -65,7 +65,7 @@ export function LoginForm({ className, ...props }) {
         }
         router.push("/")
     }
-    const encryptedData = await handleEncrypt({ username, password });
+    const encryptedData = await handleEncrypt({ username, password },);
     try {
       const response = await fetch(`${process.env.NEXT_PUBLIC_HOST  || "http://127.0.0.1:3000"}/user/public/login`, {
         method: 'POST',
