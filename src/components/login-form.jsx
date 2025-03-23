@@ -174,7 +174,12 @@ export function LoginForm({ className, ...props }) {
           </form>
           <div className="bg-muted relative hidden md:block flex flex-col justify-center items-center border-l border-col-gray login-cide-container">
           
-    <div className="grid w-full max-w-sm items-center gap-1.5">
+            <div className="grid w-full max-w-sm items-center gap-1.5">
+            <img
+                                src={"https://res.cloudinary.com/dzapdxkgc/image/upload/v1742718635/Login-cuate_apeayk.png"}
+                                alt="Profile Image"
+                                className="w-full h-full object-cover"
+                            />
       <Label htmlFor="picture">Have a code ?</Label>
       <Input 
                   id="loginCode" 

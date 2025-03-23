@@ -18,7 +18,7 @@ function Qr_gen(props) {
     };
     return (
         <span className='popup-container'>
-            <div style={{
+            <span style={{
                 backgroundColor: 'rgba(0, 0, 0, 0.73)',
                 opacity : 0.8,
                         color: 'white',
@@ -27,7 +27,7 @@ function Qr_gen(props) {
                         fontSize: '14px',
                     }}>
                         Expires in: {formatTimeLeft(timeLeft)}
-                    </div>
+                    </span>
         <Canvas
             text={link}
             options={{

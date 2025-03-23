@@ -1,11 +1,13 @@
 "use client"
 import { Button } from "@/components/ui/button";
+import Cookies from "js-cookie";
 import { useRouter } from "next/navigation";
 
 
 const SessionExpired = () => {
      const router = useRouter();
     const redirectToLogin = () => {
+        Cookies.remove("jwt_token");
         router.push("/login");
     };
     return (

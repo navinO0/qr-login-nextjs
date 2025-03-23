@@ -5,6 +5,8 @@ import parseToken from "./parseJson";
 import Loader from "./loader";
 import clearToken from "./removeToken";
 import { useRouter } from "next/navigation";
+import { Card, CardContent, CardDescription, CardFooter, CardHeader, CardTitle } from "@/components/ui/card";
+import { Button } from "@/components/ui/button";
 
 const Base64ImageDisplay = () => {
     const [imageSrc, setImageSrc] = useState(null);
@@ -82,23 +84,32 @@ const Base64ImageDisplay = () => {
             ) : (
                     (
                         <div className="dropdown dropdown-end h-screen w-screen flex items-center justify-center flex-col">
-                        <div className="w-30 rounded-full">
-                        <img
-                                src={imageSrc ? imageSrc : "https://res.cloudinary.com/dzapdxkgc/image/upload/v1742595352/download_ykpnl5.png"}
-                                alt="Profile Image"
-                                className="w-30 h-30 object-cover rounded-full border-2 border-gray-300"
-                            />
-
+                    
+                            <Card className="w-[350px] flex justify-center">
                                 
+                        <div className="w-full flex justify-start ml-6">
+                        <img
+                            src={imageSrc ? imageSrc : "https://res.cloudinary.com/dzapdxkgc/image/upload/v1742595352/download_ykpnl5.png"}
+                            alt="Profile Image"
+                            className="w-32 h-32 object-cover rounded-full border-2 border-gray-400 shadow-lg filter brightness-100 contrast-125"
+                            style={{
+                                boxShadow: "0px 4px 15px rgba(0, 0, 0, 0.3), inset 0 0 20px rgba(0, 0, 0, 0.5)", // Outer shadow + Vignette effect
+                                background: "linear-gradient(to bottom, rgba(255,255,255,0.1), rgba(0,0,0,0.2))", // Subtle background gradient
+                            }}
+                        />
+
+                            
+                        </div>
+                        <CardHeader>
+                          <CardTitle><span >Hello, </span > {`${userData.first_name || ''} ${userData.middle_name || ''} ${userData.last_name || ''}`.trim()}</CardTitle>
+                          <CardDescription>Welcome! Hope you have a great day! ☀️</CardDescription>
+                        </CardHeader>
+                        <CardContent>
+                        </CardContent>
+
+                            </Card>
                             </div>
-                            <span className="text-lg  text-gray-900 font-serif font-semibold font-sans ">
-                           <span className="font-bold font-serif font-semibold font-sans font-mono fs-8 text-#000">Hello, </span > {`${userData.first_name || ''} ${userData.middle_name || ''} ${userData.last_name || ''}`.trim()}
-                        </span>
-                                                    </div>
-                    //     <div className="flex items-center gap-4 border-none border-gray-300 p-2 rounded-lg">
-                            
-                            
-                    // </div>
+           
                 )
             )}
         </div>
