@@ -1,19 +1,17 @@
 "use client";
 import { useState, useEffect, useCallback, useRef } from "react";
 import Cookies from "js-cookie";
-import clearToken from "./removeToken";
 import parseToken from "./parseJson";
-import { CloseAlert } from "./closeAlert";
-import { QrWithAlert } from "./qrWithAlert";
-import MiniLoader from "./miniLoader";
 import Loader from "./loader";
+import clearToken from "./removeToken";
+import { useRouter } from "next/navigation";
 
 const Base64ImageDisplay = () => {
     const [imageSrc, setImageSrc] = useState(null);
     const [isLoading, setIsLoading] = useState(false);
     const [error, setError] = useState(null);
     const [userData, setUserData] = useState({});
-
+    const router = useRouter();
     const fetchImage = useCallback(async () => {
         setIsLoading(true);
         setError(null);
@@ -35,7 +33,9 @@ const Base64ImageDisplay = () => {
             });
 
             if (response.status === 401) {
-                clearToken();
+                Cookies.remove('jwt_token');
+                router.push("/session-expired");
+                // clearToken();
                 setError("Unauthorized: Token expired.");
                 return;
             }

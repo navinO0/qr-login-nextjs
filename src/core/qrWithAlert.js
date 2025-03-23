@@ -18,6 +18,7 @@ import clearToken from "./removeToken";
 import os from "os";
 import QrLoader from "./qrLoader";
 import ErroToaster from "./errorToaster";
+import { useRouter } from "next/navigation";
 
 const QRTimerInMints = process.env.NEXT_PUBLIC_QR_TIMER || 1;
 
@@ -51,7 +52,7 @@ export function QrWithAlert() {
     const [qrLoginCode, setQrLoginCode] = useState('');
     const [error, setError] = useState(null);
     const [hostName, setHost] = useState(getHost());
-
+    const router = useRouter();
     // Timer state
     const [timeLeft, setTimeLeft] = useState(QRTimerInMints * 60); // 5 minutes in seconds
     const [isTimerExpired, setIsTimerExpired] = useState(false); // State to track if the timer has expired
@@ -89,8 +90,10 @@ export function QrWithAlert() {
                 body: JSON.stringify({ token: token }),
             });
 
-            if(response.status === 401) {
-                clearToken()
+            if (response.status === 401) {
+                Cookies.remove('jwt_token');
+                router.push("/session-expired");
+                // clearToken()
             }
             if (response.ok) {
                 const resp = await response.json();

@@ -72,7 +72,7 @@ const LoginWithCode = () => {
                                 alt="Error Image"
                                 className="w-100"
                 />
-                <span className='text-red-600 font-semibold text-lg bg-red-100 border-l-4 border-red-500 p-3 rounded-md shadow-md '>Invalid code or code has expired</span>
+                <span className='text-red-600 font-semibold text-lg bg-red-100 border-l-4 border-red-500 p-3 rounded-md shadow-md '>{error}</span>
                 <Button onClick={redirectToLogin}  className="mt-4 w-50">Login</Button>
                 </div>}
         </div>
