@@ -18,7 +18,15 @@ import { React, useState } from "react";
 import { encryptObjectValues } from "@/core/crypto-utils";
 import { router, useRouter } from "next/navigation";
 import Cookies from "js-cookie";
+import ErroToaster from "@/core/errorToaster";
 
+
+
+const Register = () => {
+    const [loading, setLoading] = useState(false);
+    const [error, setError] = useState(null);
+    const [successMessage, setSuccessMessage] = useState(null);
+    const [profilePicture, setProfilePicture] = useState(null)
 // Define form validation schema with new fields
 const formSchema = z.object({
     username: z.string().min(2).max(50),
@@ -27,12 +35,12 @@ const formSchema = z.object({
     mobile: z.string().min(10).max(15),
     first_name: z.string().min(1),
     middle_name: z.string().optional(),
-    last_name: z.string().min(1),
+    last_name: z.string().optional(),
     // profile_picture: z
     //     .instanceof(File) // Ensure it's a File object
     //     .optional()
     //     .refine((file) => !file || file.size <= 2 * 1024 * 1024, {
-    //         message: "Profile picture must be 2MB or smaller",
+    //         message: error,
     //     }),
     // address: z.string().min(5),
     // dob: z.string().min(10),
@@ -47,13 +55,6 @@ const formSchema = z.object({
     //     message: "You must accept the terms and conditions",
     // }),
 });
-
-const Register = () => {
-    const [loading, setLoading] = useState(false);
-    const [error, setError] = useState(null);
-    const [successMessage, setSuccessMessage] = useState(null);
-    const [profilePicture, setProfilePicture] = useState(null)
-
     // Define form with validation
     const form = useForm({
         resolver: zodResolver(formSchema),
@@ -63,8 +64,8 @@ const Register = () => {
             email: "",
             mobile: "",
             first_name: "",
-            // middle_name: "",
-            // last_name: "",
+            middle_name: "",
+            last_name: "",
             profile_picture: z.optional(),
             // address: "",
             // dob: "",
@@ -78,82 +79,103 @@ const Register = () => {
             // terms_accepted: false,
         },
     });
-
     const handleFileChange = (event) => {
+        setError(null);
         const file = event.target.files[0];
-        
-        if (file) {
-            if (file.size > ((1024 * 1024)*2)) { // 1MB = 1024 * 1024 bytes
-                setError("File size must be less than 2MB");
-                return;
-            }
     
-            const reader = new FileReader();
-            reader.readAsDataURL(file);
-            reader.onload = () => {
-                setProfilePicture(reader.result);
-            };
+        if (!file) return;
+    
+        // Allowed file types
+        const allowedTypes = ["image/jpeg", "image/png", "image/webp"];
+    
+        // Check file format
+        if (!allowedTypes.includes(file.type)) {
+            setError("Only JPEG, PNG, and WEBP formats are allowed.");
+            return;
         }
+    
+        // Check file size (max 2MB)
+        if (file.size > 2 * 1024 * 1024) {
+            setError("File size must be less than 2MB.");
+            return;
+        }
+    
+        setError(null); // Clear any previous errors
+    
+        const reader = new FileReader();
+        reader.readAsDataURL(file);
+        reader.onload = () => {
+            setProfilePicture(reader.result);
+        };
+    
+        reader.onerror = () => {
+            setError("Failed to read file. Please try again.");
+        };
     };
+    
     const router = useRouter();
 
     // Handle form submission
     async function onSubmit(values) {
-        setLoading(true); // Set loading state
-        setError(null);
-        setSuccessMessage(null);
-        // Prepare data for API call
-        const requestData = {
-            username: values.username,
-            password: values.password,
-            email: values.email,
-            mobile: values.mobile,
-            first_name: values.first_name,
-            middle_name: values.middle_name || "", // Optional
-            last_name: values.last_name,
-            profile_photo: profilePicture
-        };
+            setLoading(true); // Set loading state
+            setError(null);
+            setSuccessMessage(null);
+            // Prepare data for API call
+            const requestData = {
+                username: values.username,
+                password: values.password,
+                email: values.email,
+                mobile: values.mobile,
+                first_name: values.first_name,
+                middle_name: values.middle_name || "", // Optional
+                last_name: values.last_name,
+                profile_photo: profilePicture
+            };
     
-        const encData = await encryptObjectValues(requestData, ['username', 'email', 'mobile', 'first_name', 'middle_name', "password", 'last_name']);
+            const encData = await encryptObjectValues(requestData, ['username', 'email', 'mobile', 'first_name', 'middle_name', "password", 'last_name']);
     
-        try {
-            // Send POST request to the API
-            const response = await fetch(`${process.env.NEXT_PUBLIC_HOST || "http://127.0.0.1:3000"}/user/public/create`, {
-                method: 'POST',
-                headers: {
-                    'Accept': 'application/json',
-                    'Content-Type': 'application/json',
-                },
-                body: JSON.stringify(encData),
-            });
+            try {
+                // Send POST request to the API
+                const response = await fetch(`${process.env.NEXT_PUBLIC_HOST || "http://127.0.0.1:3000"}/user/public/create`, {
+                    method: 'POST',
+                    headers: {
+                        'Accept': 'application/json',
+                        'Content-Type': 'application/json',
+                    },
+                    body: JSON.stringify(encData),
+                });
     
-            // Ensure response is valid JSON
-            const resp = await response.json();
+                // Ensure response is valid JSON
+                const resp = await response.json();
     
-            // Handle response
-            if (response.ok) {
-                const token = resp?.data?.token;
+                // Handle response
+                if (response.ok) {
+                    const token = resp?.data?.token;
     
-                if (!token || token === "undefined") {
-                    setError(resp.message || "Invalid token received");
-                    return { status: false, message: resp.message };
+                    if (!token || token === "undefined") {
+                        setError(resp.message || "Invalid token received");
+                        return { status: false, message: resp.message };
+                    }
+    
+                    Cookies.set('jwt_token', token, { expires: 1 }); // Store token for 1 day
+                    setSuccessMessage('User registered successfully!');
+                    router.push("/");
+                } else {
+                    setError(resp.message || 'Something went wrong');
                 }
-    
-                Cookies.set('jwt_token', token, { expires: 1 }); // Store token for 1 day
-                setSuccessMessage('User registered successfully!');
-                router.push("/");
-            } else {
-                setError(resp.message || 'Something went wrong');
+            } catch (error) {
+                setError(`An error occurred while trying to register: ${error.message || error}`);
+            } finally {
+                setLoading(false); // Reset loading state
             }
-        } catch (error) {
-            setError(`An error occurred while trying to register: ${error.message || error}`);
-        } finally {
-            setLoading(false); // Reset loading state
-        }
     }
     const redirectToLogin = () => {
         router.push("/login");
     }
+
+    const handleFileBlur = () => {
+        setError(null);
+    };
     
 
     return (
@@ -164,14 +186,14 @@ const Register = () => {
             <h2 className="text-3xl font-semibold text-center text-grey-600 mb-8">User Registration</h2>
 
             {successMessage && (
-                <div className="bg-green-100 text-green-700 p-4 rounded mb-4">
-                    {successMessage}
+                <div className="">
+                     <ErroToaster message={successMessage} success={true} />
                 </div>
             )}
 
             {error && (
-                <div className="bg-red-100 text-red-700 p-4 rounded mb-4">
-                    {error}
+                <div className="">
+                    <ErroToaster message={error} />
                 </div>
             )}
 
@@ -316,12 +338,12 @@ const Register = () => {
                             />
                             <FormField
                             control={form.control}
-                            name="last_name"
+                            name="profile_picture"
                             render={({ field }) => (
                                 <FormItem>
                                 <FormLabel>Profile Picture</FormLabel>
                                 <FormControl>
-                                    <Input type="file" accept="image/*" onChange={handleFileChange} />
+                                    <Input type="file" accept="image/*" onClick={handleFileBlur} onChange={handleFileChange} />
                                     </FormControl>
                                     <FormLabel className={"text-grey-500 margin-top-0 opacity-50"}>*Image size should not ecxceed 2MB</FormLabel>
                                 <FormMessage />
