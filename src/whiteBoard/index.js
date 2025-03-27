@@ -5,17 +5,15 @@ import { ReactSketchCanvas } from "react-sketch-canvas";
 import io from "socket.io-client";
 import axios from "axios";
 import { throttle } from "lodash";
-import Pako, { deflate, inflate } from "pako"; // Compression library
 import { MdDownload, MdOutlineUndo, MdOutlineSync, MdOutlineRedo, MdOutlineClear } from "react-icons/md";
 import { FaEraser, FaPen } from "react-icons/fa";
 import { Button } from "@/components/ui/button";
 import { Slider } from "@/components/ui/slider";
-import pako from "pako";
 import parseToken from "@/core/parseJson";
 import Cookies from "js-cookie";
 import { useRouter } from "next/navigation";
 
-const socket = io( process.env.NEXT_PUBLIC_HOST || "http://localhost:3008");
+const socket = io("http://localhost:3008");
 const roomId = "room123";
 
 const Whiteboard = () => {
@@ -35,15 +33,13 @@ const Whiteboard = () => {
 
         axios.get(`${process.env.NEXT_PUBLIC_HOST || "http://localhost:3009"}/load/${roomId}`).then((res) => {
             if (res.data.length > 0) {
-                const decompressedData = JSON.parse(inflate(res.data, { to: "string" }));
+                const decompressedData = JSON.parse(res.data);
                 canvasRef.current.loadPaths(decompressedData);
             }
         });
 
         socket.on("draw", (compressedData) => {
             try {
-                // const decompressedData = JSON.parse(pako.inflate(compressedData, { to: "string" })) || [];
-        
                 requestAnimationFrame(() => {
                     if (canvasRef.current) {
                         setLocalPaths((prevPaths) => {
@@ -85,7 +81,6 @@ const Whiteboard = () => {
             
             const paths = await canvasRef.current.exportPaths();
             const newStrokes = (paths[paths.length - 1]) // Get only new strokes)
-            // const compressedPaths = pako.deflate(JSON.stringify([newStrokes]));
             socket.emit("draw", { roomId, paths: [newStrokes] });
         }, 50),
         [localPaths] // Depend on localPaths to track changes
@@ -97,8 +92,7 @@ const Whiteboard = () => {
         throttle(async () => {    
             if (!canvasRef.current) return;    
             const paths = await canvasRef.current.exportPaths();
-            const compressedPaths = pako.deflate(JSON.stringify(paths));
-            socket.emit("draw", { roomId, paths: compressedPaths });
+            socket.emit("draw", { roomId, paths: paths });
         }, 500),
         [localPaths] // Depend on localPaths to track changes
     );
