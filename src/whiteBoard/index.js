@@ -13,7 +13,7 @@ import parseToken from "@/core/parseJson";
 import Cookies from "js-cookie";
 import { useRouter } from "next/navigation";
 
-const socket = io("http://localhost:3008");
+const socket = io( process.env.NEXT_PUBLIC_HOST || "http://localhost:3008");
 const roomId = "room123";
 
 const Whiteboard = () => {
