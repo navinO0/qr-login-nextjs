@@ -7,6 +7,7 @@ import clearToken from "./removeToken";
 import { useRouter } from "next/navigation";
 import { Card, CardContent, CardDescription, CardFooter, CardHeader, CardTitle } from "@/components/ui/card";
 import { Button } from "@/components/ui/button";
+import ErroToaster from "./errorToaster";
 
 const Base64ImageDisplay = () => {
     const [imageSrc, setImageSrc] = useState(null);
@@ -74,8 +75,8 @@ const Base64ImageDisplay = () => {
     return (
         <div className="flex flex-col items-center gap-4">
             {error &&
-                <div className="dropdown dropdown-end h-screen w-screen flex items-center justify-center flex-col">
-                    <p className="text-red-500">{error}</p>
+                <div className="">
+                    <ErroToaster message={error} />
                     </div>}
             {isLoading ? (
                 <div className="dropdown dropdown-end h-screen w-screen flex items-center justify-center flex-col">

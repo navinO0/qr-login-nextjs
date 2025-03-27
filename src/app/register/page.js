@@ -19,6 +19,7 @@ import { encryptObjectValues } from "@/core/crypto-utils";
 import { router, useRouter } from "next/navigation";
 import Cookies from "js-cookie";
 import ErroToaster from "@/core/errorToaster";
+import MiniLoader from "@/core/miniLoader";
 
 
 
@@ -361,7 +362,7 @@ const formSchema = z.object({
                         className="w-full py-3 mt-6 text-white bg-black hover:bg-gray-600 rounded-md hover:bg-light-700 focus:outline-none cursor-pointer"
                         disabled={loading}
                     >
-                        {loading ? 'Registering...' : 'Register'}
+                        {loading ? <MiniLoader text='Registering...'/> : 'Register'}
                         </Button>
                 </form>
                 </Form>
