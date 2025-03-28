@@ -1,13 +1,33 @@
 "use client";
-import { LoginForm } from "@/components/login-form";
-import { CloseAlert } from "@/core/closeAlert";
+import { useSession, signIn, signOut } from "next-auth/react";
+import Cookies from "js-cookie";
 
-const TestPage = () => {
-    return (<div className="flex min-h-svh flex-col items-center justify-center bg-muted p-6 md:p-10">
-        <div className="w-full max-w-sm md:max-w-3xl">
-            <LoginForm />
+export default function LoginForm() {
+  const { data: session } = useSession();
+
+  const handleLogin = async () => {
+    const res = await signIn("google");
+    if (res?.error) {
+      console.error("Login failed", res.error);
+    } else {
+      Cookies.set("jwt_token", session?.jwt, { expires: 7 });
+    }
+  };
+
+  return (
+    <div className="flex flex-col gap-6">
+      {!session ? (
+        <button onClick={handleLogin} className="bg-red-500 text-white p-2">
+          Sign in with Google
+        </button>
+      ) : (
+        <div>
+          <p>Welcome, {session.user?.name}!</p>
+          <button onClick={() => signOut()} className="bg-gray-700 text-white p-2">
+            Logout
+          </button>
         </div>
-    </div>);
-};
-
-export default TestPage;
+      )}
+    </div>
+  );
+}
