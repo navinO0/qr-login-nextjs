@@ -4,7 +4,7 @@ import { useRouter, useParams } from "next/navigation";
 import { ReactSketchCanvas } from "react-sketch-canvas";
 import React, { useRef, useCallback, useEffect, useState } from "react";
 import axios from "axios";
-import { throttle } from "lodash";
+import { set, throttle } from "lodash";
 import { MdDownload, MdOutlineUndo, MdOutlineSync, MdOutlineRedo, MdOutlineClear } from "react-icons/md";
 import { FaEraser, FaPen } from "react-icons/fa";
 import { Button } from "@/components/ui/button";
@@ -12,10 +12,10 @@ import { Slider } from "@/components/ui/slider";
 import parseToken from "@/core/parseJson";
 import Cookies from "js-cookie";
 import { io } from "socket.io-client";
-import Header from "@/core/header";
 import Qr_component from "@/core/qr_pop";
+import { PopoverDemo } from "@/core/popover";
 
-const socket = io( process.env.NEXT_PUBLIC_HOST || "http://172.26.144.1:3008", {
+const socket = io(  "http://localhost:3008", {
     transports: ["websocket"],
 });
 
@@ -31,9 +31,9 @@ const CbWhiteBoard = () => {
     const [lockedBy, setLockedBy] = useState(null); // Lock state
     const params = useParams();
     const router = useRouter();
-    const [userId] = useState(() => Math.floor(Math.random() * 100000));
+    const [username, setUsername] = useState(() => Math.floor(Math.random() * 100000));
     const roomId = params?.roomId;
-
+    const [users, setUsers] = useState([]);
     useEffect(() => {
         if (!roomId) {
             router.push("/white-board");
@@ -52,7 +52,7 @@ const CbWhiteBoard = () => {
                     canvasRef.current?.loadPaths(decompressedData);
                 }
             });
-
+           
         socket.on("draw", (compressedData) => {
             requestAnimationFrame(() => {
                 if (canvasRef.current) {
@@ -64,6 +64,7 @@ const CbWhiteBoard = () => {
                 }
             });
         });
+
 
         socket.on("clear", () => requestAnimationFrame(() => {
             canvasRef.current?.clearCanvas();
@@ -89,14 +90,14 @@ const CbWhiteBoard = () => {
         };
     }, [roomId]);
 
- 
+
 
     const handleDraw = useCallback(
         throttle(async () => {
-          if (!canvasRef.current || lockedBy && lockedBy !== userId) return;
+          if (!canvasRef.current || lockedBy && lockedBy !== username) return;
           const paths = await canvasRef.current.exportPaths();
           const newStrokes = paths[paths.length - 1];
-          socket.emit("draw", { roomId, paths: [newStrokes] });
+          socket.emit("draw", { roomId,username, paths: [newStrokes] });
         }, 50),
         [lockedBy]
       );
@@ -120,33 +121,46 @@ const CbWhiteBoard = () => {
 
             if (token) {
                 userData = parseToken(token);
+                setUsername(userData.username);
             }
-            socket.emit("cursor-move", { roomId, userId: userData?.username || userId || `user`, cursor });
+            socket.emit("cursor-move", { roomId, userId: username  || username || `user`, cursor });
         }, 5),
-        [userId]
+        [username]
     );
 
     const handleMouseDown = () => {
+        console.log("lockedBy", lockedBy);
         if (!lockedBy) {
-          setLockedBy(userId);
-          socket.emit("lock", { roomId, userId });
+          setLockedBy(username);
+          socket.emit("lock", { roomId, username });
         }
       };
     
       const handleMouseUp = () => {
-        if (lockedBy === userId) {
+        if (lockedBy === username) {
           setLockedBy(null);
           socket.emit("unlock", { roomId });
         }
       };
 
     return (
-        <div className="">
-            <Header />
-            <div className="flex justify-center items-center w-screen h-screen ">
+        <div className="border-black h-full">
+            <div className="flex justify-center items-center h-[90vh]">
+                
                 <div className="flex flex-col items-center p-2 w-[95%] h-[90%] border border-gray-300 rounded-tr-[10px] rounded-tl-[10px]">
                     <h2 className="text-xl font-semibold mb-4">Collaborative Whiteboard</h2>
+             <span style={{
+                backgroundColor: 'rgba(0, 0, 0, 0.73)',
+                opacity: 0.8,
+                color: 'white',
+                padding: '5px 10px',
+                borderRadius: '5px',
+                        fontSize: '14px',
+                        fontFamily: 'monospace',
+                marginBottom: '10px'
+            }}>Room ID: {roomId}</span>
                     <div className="flex flex-wrap justify-end gap-3 mb-0 w-full border-b-0 sm:justify-center">
+                    <PopoverDemo listUsers={Object.keys(cursors)} />
                         <Slider
                             defaultValue={[20]}
                             max={80}
@@ -165,12 +179,12 @@ const CbWhiteBoard = () => {
                     </div>
 
                     <div ref={containerRef} className="relative w-full h-full border" onMouseMove={handleMouseMove}>
-                        {Object.keys(cursors).map((userId) => {
-                            const cursor = cursors[userId];
+                        {Object.keys(cursors).map((username) => {
+                            const cursor = cursors[username];
                             return (
-                                <div key={userId} className="absolute pointer-events-none" style={{ left: `${cursor.x}px`, top: `${cursor.y}px` }}>
-                                    <div className="w-4 h-4 border-2 rounded-full" style={{ borderColor: cursorColors.current[userId] || "blue", backgroundColor: "rgba(255, 255, 255, 0.8)" }} />
-                                    <p className="absolute -top-6 left-1/2 transform -translate-x-1/2 bg-gray-800 text-white text-xs px-2 py-1 rounded-md">{userId}</p>
+                                <div key={username} className="absolute pointer-events-none" style={{ left: `${cursor.x}px`, top: `${cursor.y}px` }}>
+                                    <div className="w-4 h-4 border-2 rounded-full" style={{ borderColor: cursorColors.current[username] || "blue", backgroundColor: "rgba(255, 255, 255, 0.8)" }} />
+                                    <p className="absolute -top-6 left-1/2 transform -translate-x-1/2 bg-gray-800 text-white text-xs px-2 py-1 rounded-md">{username}</p>
                                 </div>
                             );
                         })}

@@ -1,5 +1,4 @@
-// hooks/useProtectedRoute.js
-"use client"; // Add this line to mark the file as a client component
+"use client"; 
 
 import { useEffect } from "react";
 import { useRouter } from "next/navigation";
@@ -9,9 +8,7 @@ const useProtectedRoute = () => {
     const router = useRouter();
 
     useEffect(() => {
-        // Check if JWT token exists in cookies
         const token = Cookies.get("jwt_token");
-        // If the token doesn't exist, redirect to the login page
         if (!token) {
             router.push("/login");
         }

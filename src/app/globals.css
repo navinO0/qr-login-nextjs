@@ -121,7 +121,6 @@
   justify-self: flex-start;
 }
 
-
 /* ------ popup start */
 
 .modal {
@@ -226,7 +225,6 @@
   }
 }
 
-
 /* --------QR CODE------ */
 
 .popup-container{
@@ -236,8 +234,6 @@
   align-items: center;
 }
 
-
-
 /* -------login------ */
 .login-cide-container{
 display : flex;
@@ -246,11 +242,6 @@ justify-content: center;
 align-items: center;
 padding : 20px
 } 
-
-
-
-
-
 
 /* ---home starts ----- */
 
@@ -273,9 +264,6 @@ padding : 20px
 
 /* ---------home ends ------ */
 
-
-
-
 /* -------- header --------- */
 .header-profile{
 display: flex;
@@ -285,14 +273,9 @@ gap: 10px;
 
 /* ----------header ends ------ */
 
-
 /* ---------Home0-0-------- */
 
-
-
-
 /* --------- invoice starts------- */
-
 
 .invoice-container {
   display: flex;
@@ -303,11 +286,7 @@ gap: 10px;
   justify-content: flex-start;
 }
 
-
-
 /* ----------invoice ends------ */
-
-
 
 /* HTML: <div class="loader"></div> */
 /* HTML: <div class="loader"></div> */
@@ -328,7 +307,6 @@ gap: 10px;
   83.33% {box-shadow:-19px 15px, 60px 15px,60px 15px}
   100%   {box-shadow: 60px 15px, 60px 15px,60px 15px}
 } */
-
 
 /* From Uiverse.io by barisdogansutcu */ 
 .button-among-us {
@@ -388,7 +366,6 @@ gap: 10px;
   transform: translateX(200%);
   transition-delay: 300ms;
 }
-
 
 /* From Uiverse.io by Satwinder04 */ 
 .loader {
@@ -485,8 +462,6 @@ gap: 10px;
   }
 }
 
-
-
 /* From Uiverse.io by Miaozeqiu */ 
 .loader-qr {
   width: 150px;
@@ -573,7 +548,31 @@ gap: 10px;
   }
 }
 
-
 /* .btn {
   @apply px-4 py-2 bg-blue-500 text-white rounded-md shadow-md hover:bg-blue-600 transition;
 } */
+
+
+@layer base {
+  :root {
+    --sidebar-background: 0 0% 98%;
+    --sidebar-foreground: 240 5.3% 26.1%;
+    --sidebar-primary: 240 5.9% 10%;
+    --sidebar-primary-foreground: 0 0% 98%;
+    --sidebar-accent: 240 4.8% 95.9%;
+    --sidebar-accent-foreground: 240 5.9% 10%;
+    --sidebar-border: 220 13% 91%;
+    --sidebar-ring: 217.2 91.2% 59.8%;
+  }
+
+  .dark {
+    --sidebar-background: 240 5.9% 10%;
+    --sidebar-foreground: 240 4.8% 95.9%;
+    --sidebar-primary: 224.3 76.3% 48%;
+    --sidebar-primary-foreground: 0 0% 100%;
+    --sidebar-accent: 240 3.7% 15.9%;
+    --sidebar-accent-foreground: 240 4.8% 95.9%;
+    --sidebar-border: 240 3.7% 15.9%;
+    --sidebar-ring: 217.2 91.2% 59.8%;
+  }
+}

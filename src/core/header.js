@@ -1,57 +1,44 @@
-'use client'
+"use client";
 import {
-    Menubar,
-    MenubarCheckboxItem,
-    MenubarContent,
-    MenubarItem,
-    MenubarMenu,
-    MenubarRadioGroup,
-    MenubarRadioItem,
-    MenubarSeparator,
-    MenubarShortcut,
-    MenubarSub,
-    MenubarSubContent,
-    MenubarSubTrigger,
-    MenubarTrigger,
-} from "@/components/ui/menubar"
-import Qr_gen from "./qr_generator"
-import { useState } from "react"
-import PopupComponent from "./popupComponent"
-import { Router } from "lucide-react"
-import Cookies from "js-cookie"
-import { CloseAlert } from "./closeAlert"
-import { QrWithAlert } from "./qrWithAlert"
-import HeaderProfile from "./headerProfile"
-import { Button } from "@/components/ui/button"
-
+  Menubar,
+  MenubarMenu,
+} from "@/components/ui/menubar";
+import { useEffect, useState } from "react";
+import Cookies from "js-cookie";
+import { CloseAlert } from "./closeAlert";
+import { QrWithAlert } from "./qrWithAlert";
+import { SidebarTrigger } from "@/components/ui/sidebar";
 
 const Header = () => {
-    return (
-        <div className=" ">
-            <Menubar className="border-black w-full flex justify-end border-none shadow-none space-x-6 p-7 "> 
-                <MenubarMenu>
-                    <MenubarTrigger>
-                        <QrWithAlert />
-                    </MenubarTrigger>
-                </MenubarMenu>
-                <MenubarMenu>
-                     <CloseAlert />
-                </MenubarMenu>
-            </Menubar>
+  const [visible, setVisible] = useState(false);
 
-            {/* <div className=" ">
-                <div className="navbar bg-base-100 shadow-sm">
-                    <div className="flex-1 justify-end">
-                        <a className="p-6"> <HeaderProfile /></a>
-                    </div>
-                </div>
-            </div> */}
-            
-            
-        </div>
-    )
-}
+  useEffect(() => {
+    const checkToken = () => {
+      const token = Cookies.get("jwt_token");
+      setVisible(!!token && token !== "undefined");
+    };
 
-{/* <Qr_gen qr_link={{ link: 'https://navinkambham.ccbp.tech/' }} /> */}
+    checkToken(); // Check token on mount
 
-export default Header
+    const interval = setInterval(checkToken, 1000); // Polling every second
+    return () => clearInterval(interval); // Cleanup on unmount
+  }, []);
+
+  if (!visible) return null;
+
+  return (
+    <div className="flex-1 flex justify-between items-center relative">
+      <SidebarTrigger className="cn-30px" />
+      <Menubar className="flex justify-end border-none shadow-none space-x-6 p-7 border-b flex-shrink-0">
+        <MenubarMenu>
+          <QrWithAlert />
+        </MenubarMenu>
+        <MenubarMenu>
+          <CloseAlert />
+        </MenubarMenu>
+      </Menubar>
+    </div>
+  );
+};
+
+export default Header;

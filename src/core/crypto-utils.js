@@ -1,12 +1,10 @@
 "use client"; 
 const KEY_HEX = process.env.NEXT_PUBLIC_KEY_HEX;
 
-// Convert a hex string to a Uint8Array
 function hexToUint8Array(hex) {
     return new Uint8Array(hex.match(/.{1,2}/g).map(byte => parseInt(byte, 16)));
 }
 
-// Encrypt object values with IV and authentication tag
 async function encryptObjectValues(obj, enc_keys) {
     const keyBuffer = hexToUint8Array(KEY_HEX);
     const key = await crypto.subtle.importKey(

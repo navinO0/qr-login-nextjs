@@ -12,11 +12,12 @@ import {
 } from "@/components/ui/alert-dialog"
 import { Button } from "@/components/ui/button"
 import clearToken from "@/core/removeToken"
-import { MenubarTrigger } from "@radix-ui/react-menubar"
+import { signOut } from "next-auth/react";
 
 export function CloseAlert() {
     const clearTokenBtn = () => {
         clearToken()
+        signOut({ callbackUrl: `${process.env.NEXT_PUBLIC_HOST_QR}/login` });
     }
     
     return (

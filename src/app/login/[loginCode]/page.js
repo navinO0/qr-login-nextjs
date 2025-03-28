@@ -1,7 +1,7 @@
 "use client";
 
 import { useEffect, useState } from 'react';
-import { useParams, useRouter } from 'next/navigation'; // For navigation
+import { useParams, useRouter } from 'next/navigation'; 
 import loginWithCodeFunc from '@/core/loginWithCodeFunc';
 import Loader from '@/core/loader';
 import ErroToaster from '@/core/errorToaster';
@@ -12,15 +12,15 @@ const LoginWithCode = () => {
     const router = useRouter();
     const [loginCode, setLoginCode] = useState(null);
     const [isLoading, setIsLoading] = useState(false);
-    const [error, setError] = useState(null); // To handle errors
+    const [error, setError] = useState(null); 
 
-    // useEffect to handle the params asynchronously and unwrap them
+
     useEffect(() => {
-        // Ensure that params is available and unwrapped
+
         if (params && params.loginCode) {
-            setLoginCode(params.loginCode); // Extract loginCode
+            setLoginCode(params.loginCode); 
         }
-    }, [params]); // Only run this effect when params change
+    }, [params]); 
 
     const onSubmit = async () => {
         if (!loginCode) {
@@ -53,11 +53,10 @@ const LoginWithCode = () => {
     };
 
     useEffect(() => {
-        // Trigger onSubmit when loginCode is available
         if (loginCode) {
             onSubmit();
         }
-    }, [loginCode]); // Ensure onSubmit runs only when loginCode is available
+    }, [loginCode]); 
 
     const redirectToLogin = () => {
         router.push("/login");

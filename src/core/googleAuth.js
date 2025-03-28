@@ -1,7 +1,7 @@
 import NextAuth from "next-auth";
 import GoogleProvider from "next-auth/providers/google";
 import jwt from "jsonwebtoken";
-import knex from "@/lib/knex"; // Import Knex instance
+import knex from "@/lib/knex"; 
 
 export default NextAuth({
   providers: [

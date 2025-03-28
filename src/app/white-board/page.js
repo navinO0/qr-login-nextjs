@@ -22,7 +22,7 @@ const JoinRoom = () => {
     };
 
     return (
-        <div className="flex justify-center items-center w-screen h-screen">
+        <div className="flex-1 flex justify-center items-center relative w-[100%] h-[90vh]">
         <Card className="w-[350px]">
             <CardHeader>
                 <CardTitle>Join a Room</CardTitle>
@@ -42,7 +42,6 @@ const JoinRoom = () => {
                 </form>
             </CardContent>
             <CardFooter className="flex justify-between">
-                <Button variant="outline" onClick={() => router.refresh()}>Cancel</Button>
                 <Button onClick={handleSubmit}>Join</Button>
             </CardFooter>
             </Card>

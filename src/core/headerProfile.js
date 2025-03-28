@@ -8,6 +8,7 @@ import { useRouter } from "next/navigation";
 import { Card, CardContent, CardDescription, CardFooter, CardHeader, CardTitle } from "@/components/ui/card";
 import { Button } from "@/components/ui/button";
 import ErroToaster from "./errorToaster";
+import { useSession } from "next-auth/react";
 
 const Base64ImageDisplay = () => {
     const [imageSrc, setImageSrc] = useState(null);
@@ -15,6 +16,8 @@ const Base64ImageDisplay = () => {
     const [error, setError] = useState(null);
     const [userData, setUserData] = useState({});
     const router = useRouter();
+
+    const { data: session } = useSession();
     const fetchImage = useCallback(async () => {
         setIsLoading(true);
         setError(null);
@@ -66,31 +69,34 @@ const Base64ImageDisplay = () => {
 
     useEffect(() => {
         const token = Cookies.get('jwt_token');
-        if (token) {
-            setUserData(parseToken(token));
+        if (!(session?.user?.image)) {
+            if (token) {
+                setUserData(parseToken(token));
+            }
+            fetchImage();
         }
-        fetchImage();
-    }, [fetchImage]);
+        
+    }, []);
 
     return (
-        <div className="flex flex-col items-center gap-4">
+        <div className="flex-1 flex justify-center items-center relative w-[90vw] h-[90vh]">
             {error &&
                 <div className="">
                     <ErroToaster message={error} />
                     </div>}
             {isLoading ? (
-                <div className="dropdown dropdown-end h-screen w-screen flex items-center justify-center flex-col">
+                <div className=" w-100% h-[90vh]  flex items-center justify-center flex-col">
                 <Loader />
                 </div>
             ) : (
                     (
-                        <div className="dropdown dropdown-end h-screen w-screen flex items-center justify-center flex-col">
+                        <div className=" w-100%  h-[90vh] flex items-center justify-center flex-col">
                     
                             <Card className="w-[350px] flex justify-center">
                                 
-                        <div className="w-full flex justify-start ml-6">
+                        <div className=" flex justify-start ml-6">
                         <img
-                            src={imageSrc ? imageSrc : "https://res.cloudinary.com/dzapdxkgc/image/upload/v1742595352/download_ykpnl5.png"}
+                            src={imageSrc ? imageSrc  : session?.user?.image || "https://res.cloudinary.com/dzapdxkgc/image/upload/v1742595352/download_ykpnl5.png"}
                             alt="Profile Image"
                             className="w-32 h-32 object-cover rounded-full border-2 border-gray-400 shadow-lg filter brightness-100 contrast-125"
                             style={{
@@ -102,7 +108,7 @@ const Base64ImageDisplay = () => {
                             
                         </div>
                         <CardHeader>
-                          <CardTitle><span >Hello, </span > {`${userData.first_name || ''} ${userData.middle_name || ''} ${userData.last_name || ''}`.trim()}</CardTitle>
+                          <CardTitle><span >Hello, </span > {`${userData.first_name || session?.user?.name || ''} ${userData.middle_name || ''} ${userData.last_name || ''}`.trim()}</CardTitle>
                           <CardDescription>Welcome! Hope you have a great day! ☀️</CardDescription>
                         </CardHeader>
                         <CardContent>
@@ -110,7 +116,6 @@ const Base64ImageDisplay = () => {
 
                             </Card>
                             </div>
-           
                 )
             )}
         </div>

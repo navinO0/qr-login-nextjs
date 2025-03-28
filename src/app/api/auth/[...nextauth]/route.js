@@ -1,5 +1,7 @@
 import NextAuth from "next-auth";
 import GoogleProvider from "next-auth/providers/google";
+import jwt from "jsonwebtoken";
+import Cookies from "js-cookie";
 
 export const authOptions = {
   providers: [
@@ -9,6 +11,33 @@ export const authOptions = {
     }),
   ],
   secret: process.env.NEXTAUTH_SECRET,
+  session: {
+    strategy: "jwt", // Use JWT for authentication
+  },
+  callbacks: {
+    async jwt({ token, user }) {
+      if (user) {
+        token.id = user.id;
+          token.email = user.email;
+          token.name = user.name;
+        token.accessToken = jwt.sign(
+          { id: user.id, email: user.email, name: user.name, username: user.name},
+          process.env.NEXT_PUBLIC_JWT_SECRET,
+          { expiresIn: "1d" }
+          );
+          }
+      return token;
+    },
+    async session({ session, token }) {
+      session.user.id = token.id;
+      session.user.email = token.email;
+      session.user.token = token.accessToken;
+        session.user.name = token.name;
+        session.username = token.name
+      session.user.first_name = token.name  // Attach JWT token to session
+      return session;
+    },
+  },
 };
 
 const handler = NextAuth(authOptions);

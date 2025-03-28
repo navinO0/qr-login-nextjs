@@ -6,67 +6,61 @@ import { Input } from "@/components/ui/input";
 import { Label } from "@/components/ui/label";
 import { useForm } from "react-hook-form";
 import { useState, useEffect } from 'react';
-import { useRouter } from 'next/navigation'; // Use this for redirect
-import Cookies from 'js-cookie'; // Import js-cookie to handle cookies
+import { useRouter } from 'next/navigation';
+import Cookies from 'js-cookie';
 import loginWithCodeFunc from "@/core/loginWithCodeFunc";
 import { encryptObjectValues } from "@/core/crypto-utils";
 import MiniLoader from "@/core/miniLoader";
 import ErroToaster from "@/core/errorToaster";
-// Define schema for form validation
-// const formSchema = z.object({
-//     username: z.string().min(2).max(50).optional(),
-//     password: z.string().min(8).max(50).optional(), // Add password validation
-//     loginCode : z.string().optional()
-// });
+import { useSession, signIn, signOut } from "next-auth/react";
+
 
 export function LoginForm({ className, ...props }) {
   const router = useRouter();
-  
- useEffect(() => {
-  async function fetchData() {
-    const token = Cookies.get("jwt_token");
-    if (token) {
-      router.push("/"); // Redirect to the home page if the token exists
-    }
-  }
 
-  fetchData(); // Call the async function
-}, [router]);
-   async function handleEncrypt(data) {
-    return await encryptObjectValues(data,['username','password']);
+  useEffect(() => {
+    async function fetchData() {
+      const token = Cookies.get("jwt_token");
+      if (token) {
+        router.push("/");
+      }
+    }
+    
+
+    fetchData();
+  }, [router]);
+  async function handleEncrypt(data) {
+    return await encryptObjectValues(data, ['username', 'password']);
   }
 
   const [isLoading, setIsLoading] = useState(false);
-  const [error, setError] = useState(null); // To handle errors
+  const [error, setError] = useState(null);
 
-    const [isLoading1, setIsLoading1] = useState(false);
-    const [error1, setError1] = useState(null); // To handle errors
+  const [isLoading1, setIsLoading1] = useState(false);
+  const [error1, setError1] = useState(null);
 
-  // Setup form with react-hook-form
   const form = useForm({
-    // resolver: zodResolver(formSchema),
     defaultValues: {
       username: "",
       password: "",
-      loginCode : ""
+      loginCode: ""
     },
   });
 
-  // Define a submit handler
   const onSubmit = async (values) => {
     setIsLoading(true);
     setError(null);
     const { loginCode, username, password } = values;
     if (loginCode) {
       const logi = await loginWithCodeFunc(loginCode);
-        if (logi !== true) {
-            setError1(logi)
-        }
-        router.push("/")
+      if (logi !== true) {
+        setError1(logi)
+      }
+      router.push("/")
     }
     const encryptedData = await handleEncrypt({ username, password },);
     try {
-      const response = await fetch(`${process.env.NEXT_PUBLIC_HOST  || "http://127.0.0.1:3000"}/user/public/login`, {
+      const response = await fetch(`${process.env.NEXT_PUBLIC_HOST || "http://127.0.0.1:3000"}/user/public/login`, {
         method: 'POST',
         headers: {
           'Accept': 'application/json',
@@ -78,17 +72,14 @@ export function LoginForm({ className, ...props }) {
       });
 
       if (response.ok) {
-        // Handle successful login (get JWT token from response)
         const resp = await response.json();
         const token = resp.data.token;
-        // Store the JWT token in cookies
         if (!token || token === 'undefined') {
-            setError(resp.message || 'An error occurred while logging in.');
-            return
+          setError(resp.message || 'An error occurred while logging in.');
+          return
         }
-        Cookies.set('jwt_token', token, { expires: 1 }); // Store token for 1 day
+        Cookies.set('jwt_token', token, { expires: 1 });
 
-        // Redirect to the homepage after successful login
         router.push('/');
       } else {
         const errorData = await response.json();
@@ -102,19 +93,19 @@ export function LoginForm({ className, ...props }) {
     }
   };
 
-   const codeSubmit = async (values) => {
+  const codeSubmit = async (values) => {
     setIsLoading1(true);
     setError1(null);
-    const { loginCode  } = values;
+    const { loginCode } = values;
     try {
-     if (loginCode) {
-       const logi = await loginWithCodeFunc(loginCode);
+      if (loginCode) {
+        const logi = await loginWithCodeFunc(loginCode);
         if (!logi.status || logi.status === 'false') {
           setError1(logi.message)
           return
         }
         router.push("/")
-    }
+      }
     } catch (error) {
       setError1('Failed to connect to the server.');
       console.error('Login failed:', error);
@@ -122,6 +113,18 @@ export function LoginForm({ className, ...props }) {
       setIsLoading1(false);
     }
   };
+
+  const { data: session } = useSession();
+  const yyyy = useSession();
+  console.log(yyyy)
+    const handleLogin = async () => {
+      const res = await signIn("google");
+      if (res?.error) {
+        console.error("Login failed", res.error);
+      } else {
+        Cookies.set("jwt_token", session?.jwt, { expires: 7 });
+      }
+    };
 
   return (
     <div className={cn("flex flex-col gap-6", className)} {...props}>
@@ -137,12 +140,12 @@ export function LoginForm({ className, ...props }) {
               </div>
               <div className="grid gap-3">
                 <Label htmlFor="username">Username</Label>
-                <Input 
-                  id="username" 
-                  type="text" 
-                  placeholder="Username" 
-                  {...form.register("username")} 
-                  required 
+                <Input
+                  id="username"
+                  type="text"
+                  placeholder="Username"
+                  {...form.register("username")}
+                  required
                 />
               </div>
               <div className="grid gap-3">
@@ -152,15 +155,15 @@ export function LoginForm({ className, ...props }) {
                     Forgot your password?
                   </a> */}
                 </div>
-                <Input 
-                  id="password" 
-                  type="password" 
-                placeholder = "********"
-                  {...form.register("password")} 
-                  required 
+                <Input
+                  id="password"
+                  type="password"
+                  placeholder="********"
+                  {...form.register("password")}
+                  required
                 />
               </div>
-              <Button type="submit" className="w-full" disabled={isLoading}>
+              <Button type="submit" className="w-full cursor-pointer" disabled={isLoading} >
                 {isLoading ? <MiniLoader /> : "Login"}
               </Button>
               <ErroToaster message={error} />
@@ -173,27 +176,41 @@ export function LoginForm({ className, ...props }) {
             </div>
           </form>
           <div className="bg-muted relative hidden md:block flex flex-col justify-center items-center border-l border-col-gray login-cide-container">
-          
+
             <div className="grid w-full max-w-sm items-center gap-1.5">
-            <img
-                                src={"https://res.cloudinary.com/dzapdxkgc/image/upload/v1742718635/Login-cuate_apeayk.png"}
-                                alt="Profile Image"
-                                className="w-full h-full object-cover"
-                            />
-      <Label htmlFor="picture">Have a code ?</Label>
-      <Input 
-                  id="loginCode" 
-                  type="text" 
-                placeholder = "********"
-                  {...form.register("loginCode")} 
-                  required 
+              <img
+                src={"https://res.cloudinary.com/dzapdxkgc/image/upload/v1742718635/Login-cuate_apeayk.png"}
+                alt="Profile Image"
+                className="w-full h-full object-cover"
               />
-              
-              <Button type="button" onClick={form.handleSubmit(codeSubmit)} className="w-full" disabled={isLoading1}>
+              <Label htmlFor="picture">Have a code ?</Label>
+              <Input
+                id="loginCode"
+                type="text"
+                placeholder="********"
+                {...form.register("loginCode")}
+                required
+              />
+
+              <Button type="button" onClick={form.handleSubmit(codeSubmit)} className="w-full cursor-pointer" disabled={isLoading1}>
                 {isLoading1 ? <MiniLoader /> : "Submit"}
               </Button>
+              <div className="flex flex-col gap-6">
+                    {!session ? (
+                      <Button onClick={handleLogin} className="w-full cursor-pointer" >
+                        Sign in with Google
+                      </Button>
+                    ) : (
+                      <div>
+                        <p>Welcome, {session.user?.name}!</p>
+                        <Button onClick={() => signOut()} className="w-full cursor-pointer" >
+                          Logout
+                        </Button>
+                      </div>
+                    )}
+                  </div>
               <ErroToaster message={error1} />
-    </div>
+            </div>
           </div>
         </CardContent>
       </Card>

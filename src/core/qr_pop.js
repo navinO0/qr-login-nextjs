@@ -24,19 +24,19 @@ return (
     <div>
             <AlertDialog>
             <AlertDialogTrigger asChild>
-                <span  className="cursor-pointer flex items-end justify-end ">
-                    <span className="hidden md:inline"></span>
+                <span  className="cursor-pointer flex items-end gap-2 justify-end ">
                     <img
                         alt="Scan QR Code"
                         src="https://res.cloudinary.com/dzapdxkgc/image/upload/v1742564270/qrcode-scan-svgrepo-com_lcxjjd.svg"
                         className="h-5 w-5"
                     />
+                    <span className="hidden md:inline">Colloborate</span>
                 </span>
             </AlertDialogTrigger>
                 <AlertDialogContent>
                     {/* Timer Display */}
                     <AlertDialogHeader>
-                        <AlertDialogTitle>Scan to add device</AlertDialogTitle>
+                        <AlertDialogTitle>Scan to collaborat</AlertDialogTitle>
                         <AlertDialogDescription>
                             <span className="content w-full h-full flex flex-col items-center justify-center">
                                
