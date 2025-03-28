@@ -15,6 +15,7 @@ import { getToken } from "next-auth/jwt";
 const UserContext = createContext();
 
 export default function Home() {
+  useProtectedRoute();
   const [userData, setUserData] = useState({});
   const router = useRouter();
   const { data: session } = useSession();

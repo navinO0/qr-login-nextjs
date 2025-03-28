@@ -14,12 +14,14 @@ import Cookies from "js-cookie";
 import { io } from "socket.io-client";
 import Qr_component from "@/core/qr_pop";
 import { PopoverDemo } from "@/core/popover";
+import useProtectedRoute from "@/core/protectedRoute";
 
-const socket = io(  "http://localhost:3008", {
+const socket = io( process.env.NEXT_PUBLIC_HOST || "http://localhost:3008", {
     transports: ["websocket"],
 });
 
 const CbWhiteBoard = () => {
+    useProtectedRoute()
     const canvasRef = useRef(null);
     const containerRef = useRef(null);
     const cursorColors = useRef({});

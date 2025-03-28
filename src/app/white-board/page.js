@@ -6,8 +6,10 @@ import { Card, CardHeader, CardTitle, CardDescription, CardContent, CardFooter }
 import { Label } from "@/components/ui/label";
 import { Input } from "@/components/ui/input";
 import { Button } from "@/components/ui/button";
+import useProtectedRoute from "@/core/protectedRoute";
 
 const JoinRoom = () => {
+    useProtectedRoute()
     const [roomId, setRoomId] = useState("");
     const router = useRouter();
 
