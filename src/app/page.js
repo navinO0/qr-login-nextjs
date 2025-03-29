@@ -1,27 +1,20 @@
 "use client";
 
 import useProtectedRoute from "@/core/protectedRoute";
-import Header from "@/core/header";
-import Whiteboard from "@/whiteBoard";
 import { createContext, useContext, useEffect, useState } from "react";
 import Cookies from "js-cookie";
 import parseToken from "@/core/parseJson";
 import { useRouter } from "next/navigation";
-import Base64ImageDisplay from "@/core/headerProfile";
 import { useSession } from "next-auth/react";
-import axios from "axios";
-import { getToken } from "next-auth/jwt";
+
 
 const UserContext = createContext();
 
 export default function Home() {
-  useProtectedRoute();
   const [userData, setUserData] = useState({});
-  const router = useRouter();
   const { data: session } = useSession();
-    console.log("JWT Token:", session);
   useEffect(() => {
-   if(session?.user?.token){
+   if(session?.user?.token && session?.user?.token !== "undefined"){
     Cookies.set("jwt_token", session.user.token);
    }
     const token = Cookies.get("jwt_token");
@@ -33,7 +26,7 @@ export default function Home() {
   useEffect(() => {
     if (userData) console.log("User data:", userData);
   }, [userData]);
-
+  useProtectedRoute();
   return (
     <UserContext.Provider value={{ userData, setUserData }}>
       <div className="flex">
