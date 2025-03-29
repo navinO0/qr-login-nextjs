@@ -19,7 +19,7 @@ import ChatUI from "../../../core/chatUi";
 import ActiveUsers from "@/core/activeUsers";
 
 
-const socket = io(  "http://localhost:3008", {
+const socket = io(process.env.NEXT_PUBLIC_HOST ||  "http://localhost:3008", {
     transports: ["websocket"],
 });
 
