@@ -5,7 +5,7 @@ import { ReactSketchCanvas } from "react-sketch-canvas";
 import React, { useRef, useCallback, useEffect, useState } from "react";
 import axios from "axios";
 import { set, throttle } from "lodash";
-import { MdDownload, MdOutlineUndo, MdOutlineSync, MdOutlineRedo, MdOutlineClear } from "react-icons/md";
+import { MdOutlineUndo, MdOutlineSync, MdOutlineRedo, MdOutlineClear } from "react-icons/md";
 import { FaEraser, FaPen } from "react-icons/fa";
 import { Button } from "@/components/ui/button";
 import { Slider } from "@/components/ui/slider";
@@ -15,6 +15,9 @@ import { io } from "socket.io-client";
 import Qr_component from "@/core/qr_pop";
 import { PopoverDemo } from "@/core/popover";
 import useProtectedRoute from "@/core/protectedRoute";
+import ChatUI from "../../../core/chatUi";
+import ActiveUsers from "@/core/activeUsers";
+
 
 const socket = io( process.env.NEXT_PUBLIC_HOST || "http://localhost:3008", {
     transports: ["websocket"],
@@ -35,26 +38,55 @@ const CbWhiteBoard = () => {
     const router = useRouter();
     const [username, setUsername] = useState(() => Math.floor(Math.random() * 100000));
     const roomId = params?.roomId;
-    const [users, setUsers] = useState([]);
+    const [recieveMessage, setRecieveMessage] = useState([{ id: '', message: '', userId: "", time: "" }]);
+    const [message, setMessage] = useState("Hey yooo");
     useEffect(() => {
         if (!roomId) {
             router.push("/white-board");
         }
     }, [roomId, router]);
 
+    const loadRoomData = async () => {
+        try {
+            const token = Cookies.get("jwt_token"); // Get token from cookies
+    
+            if (!token) {
+                console.error("No auth token found!");
+                return;
+            }
+    
+            const res = await axios.get(
+                `${process.env.NEXT_PUBLIC_HOST || "http://localhost:3009"}/wb/load/${roomId}`,
+                {
+                    headers: {
+                        Authorization: `Bearer ${token}`, // Send token in header
+                    },
+                    withCredentials: true, // Ensure cookies are sent in cross-origin requests
+                }
+            );
+    
+            if (res.data.data.length > 0) {
+                console.log(res.data.data)
+                setRecieveMessage((prevData) => [...prevData, ...res.data.data]);
+            }
+        } catch (error) {
+            console.error("Failed to load room data:", error);
+        }
+    };
+
     useEffect(() => {
         if (!roomId) return;
+        const token = Cookies.get("jwt_token");
+        let userData;
 
+        if (token) {
+            userData = parseToken(token);
+            setUsername(userData.username);
+        }
         socket.emit("join-room", roomId);
 
-        axios.get(`${process.env.NEXT_PUBLIC_HOST || "http://localhost:3009"}/load/${roomId}`)
-            .then((res) => {
-                if (res.data.length > 0) {
-                    const decompressedData = JSON.parse(res.data);
-                    canvasRef.current?.loadPaths(decompressedData);
-                }
-            });
-           
+        loadRoomData()
+
         socket.on("draw", (compressedData) => {
             requestAnimationFrame(() => {
                 if (canvasRef.current) {
@@ -78,7 +110,7 @@ const CbWhiteBoard = () => {
 
         socket.on("lock", (user) => setLockedBy(user));
         socket.on("unlock", () => setLockedBy(null));
-
+        socket.on("message", (data) => { setRecieveMessage((prevmessages) => [...prevmessages, data]); console.log(message) });
         socket.on("cursor-move", ({ userId, cursor }) => {
             setCursors((prev) => ({ ...prev, [userId]: cursor }));
             if (!cursorColors.current[userId]) {
@@ -96,13 +128,13 @@ const CbWhiteBoard = () => {
 
     const handleDraw = useCallback(
         throttle(async () => {
-          if (!canvasRef.current || lockedBy && lockedBy !== username) return;
-          const paths = await canvasRef.current.exportPaths();
-          const newStrokes = paths[paths.length - 1];
-          socket.emit("draw", { roomId,username, paths: [newStrokes] });
+            if (!canvasRef.current || lockedBy && lockedBy !== username) return;
+            const paths = await canvasRef.current.exportPaths();
+            const newStrokes = paths[paths.length - 1];
+            socket.emit("draw", { roomId, username, paths: [newStrokes] });
         }, 50),
         [lockedBy]
-      );
+    );
 
     const handleSync = useCallback(
         throttle(async () => {
@@ -118,14 +150,7 @@ const CbWhiteBoard = () => {
             if (!containerRef.current) return;
             const { left, top } = containerRef.current.getBoundingClientRect();
             const cursor = { x: e.clientX - left, y: e.clientY - top };
-            const token = Cookies.get("jwt_token");
-            let userData;
-
-            if (token) {
-                userData = parseToken(token);
-                setUsername(userData.username);
-            }
-            socket.emit("cursor-move", { roomId, userId: username  || username || `user`, cursor });
+            socket.emit("cursor-move", { roomId, userId: username || username || `user`, cursor });
         }, 5),
         [username]
     );
@@ -133,36 +158,57 @@ const CbWhiteBoard = () => {
     const handleMouseDown = () => {
         console.log("lockedBy", lockedBy);
         if (!lockedBy) {
-          setLockedBy(username);
-          socket.emit("lock", { roomId, username });
+            setLockedBy(username);
+            socket.emit("lock", { roomId, username });
         }
-      };
-    
-      const handleMouseUp = () => {
+    };
+
+    const handleMouseUp = () => {
         if (lockedBy === username) {
-          setLockedBy(null);
-          socket.emit("unlock", { roomId });
+            setLockedBy(null);
+            socket.emit("unlock", { roomId });
         }
-      };
+    };
+
+    function formatTime(number) {
+        return number < 10 ? '0' + number : number;
+    }
+
+    const handleSubmit = () => {
+        if (message.trim() !== "") {
+            const now = new Date();
+            const hours = formatTime(now.getHours());
+            const minutes = formatTime(now.getMinutes());
+            socket.emit("message", { id: (Math.random() * 100000), roomId, userId: username, message: message, time: `${hours}:${minutes}` });
+            setMessage("")
+        }
+    };
+
 
     return (
         <div className="border-black h-full">
             <div className="flex justify-center items-center h-[90vh]">
-                
+
                 <div className="flex flex-col items-center p-2 w-[95%] h-[90%] border border-gray-300 rounded-tr-[10px] rounded-tl-[10px]">
                     <h2 className="text-xl font-semibold mb-4">Collaborative Whiteboard</h2>
-             <span style={{
-                backgroundColor: 'rgba(0, 0, 0, 0.73)',
-                opacity: 0.8,
-                color: 'white',
-                padding: '5px 10px',
-                borderRadius: '5px',
+                    <span style={{
+                        backgroundColor: 'rgba(0, 0, 0, 0.73)',
+                        opacity: 0.8,
+                        color: 'white',
+                        padding: '5px 10px',
+                        borderRadius: '5px',
                         fontSize: '14px',
                         fontFamily: 'monospace',
-                marginBottom: '10px'
-            }}>Room ID: {roomId}</span>
+                        marginBottom: '10px'
+                    }}>Room ID: {roomId}</span>
                     <div className="flex flex-wrap justify-end gap-3 mb-0 w-full border-b-0 sm:justify-center">
-                    <PopoverDemo listUsers={Object.keys(cursors)} />
+                        <PopoverDemo buttonText="Chat">
+                            <ChatUI props={{ recieveMessage, username, setMessage, handleSubmit, message }} />
+                        </PopoverDemo>
+                        <PopoverDemo buttonText="Users in the Room">
+                            <ActiveUsers listUsers={Object.keys(cursors)} />
+                        </PopoverDemo>
+
                         <Slider
                             defaultValue={[20]}
                             max={80}
@@ -177,7 +223,7 @@ const CbWhiteBoard = () => {
                         <Button onClick={() => { canvasRef.current?.undo(); socket.emit("undo", roomId); }} variant="Ghost"><MdOutlineUndo /></Button>
                         <Button onClick={() => { canvasRef.current?.redo(); socket.emit("redo", roomId); }} variant="Ghost"><MdOutlineRedo /></Button>
                         <Button onClick={() => { canvasRef.current?.clearCanvas(); socket.emit("clear", roomId); window.location.reload(); }} variant="Ghost"><MdOutlineClear /></Button>
-                   <Qr_component roomId={ roomId} />
+                        <Qr_component roomId={roomId} />
                     </div>
 
                     <div ref={containerRef} className="relative w-full h-full border" onMouseMove={handleMouseMove}>
@@ -190,10 +236,15 @@ const CbWhiteBoard = () => {
                                 </div>
                             );
                         })}
-                        <ReactSketchCanvas ref={canvasRef} strokeWidth={eraser ? 20 : strokeWidth} strokeColor={eraser ? "#f8f9fa" : strokeColor} width="100%" height="100%" canvasColor="#f8f9fa" eraserWidth={20} onStroke={handleDraw}  onMouseDown={handleMouseDown}
-              onMouseUp={handleMouseUp} />
+                        <ReactSketchCanvas ref={canvasRef} strokeWidth={eraser ? 20 : strokeWidth} strokeColor={eraser ? "#f8f9fa" : strokeColor} width="100%" height="100%" canvasColor="#f8f9fa" eraserWidth={20} onStroke={handleDraw} onMouseDown={handleMouseDown}
+                            onMouseUp={handleMouseUp} />
                     </div>
                 </div>
+            </div>
+            <div className="flex-1 flex justify-center items-center relative w-[100%] h-[90vh]">
+                <h1>{recieveMessage[0].userId !== username && recieveMessage[0].message}</h1>
+            </div>
+            <div>
             </div>
         </div>
     );

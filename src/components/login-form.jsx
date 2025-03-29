@@ -74,7 +74,7 @@ export function LoginForm({ className, ...props }) {
       if (response.ok) {
         const resp = await response.json();
         const token = resp.data.token;
-        if (!token || token === 'undefined') {
+        if (!token || token === 'undefined' || token === 'null' || token === undefined) {
           setError(resp.message || 'An error occurred while logging in.');
           return
         }
@@ -195,13 +195,13 @@ export function LoginForm({ className, ...props }) {
               </Button>
               <div className="flex flex-col gap-6">
                     {!session ? (
-                      <Button onClick={handleLogin} className="w-full cursor-pointer" >
+                      <Button onClick={handleLogin} className="w-full cursor-pointer" disabled >
                         Sign in with Google
                       </Button>
                     ) : (
                       <div>
                         <p>Welcome, {session.user?.name}!</p>
-                        <Button onClick={() => signOut()} className="w-full cursor-pointer" >
+                        <Button onClick={() => signOut()} className="w-full cursor-pointer" disabled >
                           Logout
                         </Button>
                       </div>

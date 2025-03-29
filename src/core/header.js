@@ -27,8 +27,8 @@ const Header = () => {
   if (!visible) return null;
 
   return (
-    <div className="flex-1 flex justify-between items-center relative">
-      <SidebarTrigger className="cn-30px" />
+    <div className="flex-1 flex justify-between items-center relative gap-4 pl-2">
+      <SidebarTrigger className="font-size-7" />
       <Menubar className="flex justify-end border-none shadow-none space-x-6 p-7 border-b flex-shrink-0">
         <MenubarMenu>
           <QrWithAlert />
