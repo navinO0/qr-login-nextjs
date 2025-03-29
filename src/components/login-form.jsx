@@ -21,7 +21,7 @@ export function LoginForm({ className, ...props }) {
   useEffect(() => {
     async function fetchData() {
       const token = Cookies.get("jwt_token");
-      if (token) {
+      if (token && (token !== "undefined" && token !== "null" && token !== undefined)) {
         router.push("/");
       }
     }
@@ -115,8 +115,6 @@ export function LoginForm({ className, ...props }) {
   };
 
   const { data: session } = useSession();
-  const yyyy = useSession();
-  console.log(yyyy)
     const handleLogin = async () => {
       const res = await signIn("google");
       if (res?.error) {

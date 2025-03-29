@@ -10,7 +10,7 @@ export default function LoginForm() {
     if (res?.error) {
       console.error("Login failed", res.error);
     } else {
-      Cookies.set("jwt_token", session?.jwt, { expires: 7 });
+    //   Cookies.set("jwt_token", session?.jwt, { expires: 7 });
     }
   };
 

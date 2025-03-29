@@ -1,7 +1,6 @@
 import NextAuth from "next-auth";
 import GoogleProvider from "next-auth/providers/google";
 import jwt from "jsonwebtoken";
-import Cookies from "js-cookie";
 
 export const authOptions = {
   providers: [
