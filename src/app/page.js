@@ -24,7 +24,6 @@ export default function Home() {
   }, [session]);
 
   useEffect(() => {
-    if (userData) console.log("User data:", userData);
   }, [userData]);
   useProtectedRoute();
   return (

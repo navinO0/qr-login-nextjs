@@ -19,11 +19,6 @@ export default function Home() {
       setUserData(parseToken(token));
     }
   }, [session]);
-
-  useEffect(() => {
-    if (userData) console.log("User data:", userData);
-  }, [userData]);
-
   return (
       <div className="flex">
         <div className="flex justify-center items-center ">

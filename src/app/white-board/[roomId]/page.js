@@ -66,7 +66,6 @@ const CbWhiteBoard = () => {
             );
     
             if (res.data.data.length > 0) {
-                console.log(res.data.data)
                 setRecieveMessage((prevData) => [...prevData, ...res.data.data]);
             }
         } catch (error) {
@@ -110,7 +109,7 @@ const CbWhiteBoard = () => {
 
         socket.on("lock", (user) => setLockedBy(user));
         socket.on("unlock", () => setLockedBy(null));
-        socket.on("message", (data) => { setRecieveMessage((prevmessages) => [...prevmessages, data]); console.log(message) });
+        socket.on("message", (data) => { setRecieveMessage((prevmessages) => [...prevmessages, data]);});
         socket.on("cursor-move", ({ userId, cursor }) => {
             setCursors((prev) => ({ ...prev, [userId]: cursor }));
             if (!cursorColors.current[userId]) {
@@ -156,7 +155,6 @@ const CbWhiteBoard = () => {
     );
 
     const handleMouseDown = () => {
-        console.log("lockedBy", lockedBy);
         if (!lockedBy) {
             setLockedBy(username);
             socket.emit("lock", { roomId, username });

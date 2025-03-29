@@ -14,7 +14,6 @@ export default NextAuth({
   callbacks: {
     async signIn(app,{ user }) {
           try {
-          console.log("google_user",user)
         let existingUser = await app.knex("users").where({ email: user.email }).first();
 
         if (!existingUser) {
