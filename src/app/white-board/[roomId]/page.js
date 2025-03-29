@@ -19,7 +19,7 @@ import ChatUI from "../../../core/chatUi";
 import ActiveUsers from "@/core/activeUsers";
 
 
-const socket = io( process.env.NEXT_PUBLIC_HOST || "http://localhost:3008", {
+const socket = io(  "http://localhost:3008", {
     transports: ["websocket"],
 });
 
@@ -174,7 +174,8 @@ const CbWhiteBoard = () => {
         return number < 10 ? '0' + number : number;
     }
 
-    const handleSubmit = () => {
+    const handleSubmit = (e) => {
+        e.preventDefault()
         if (message.trim() !== "") {
             const now = new Date();
             const hours = formatTime(now.getHours());

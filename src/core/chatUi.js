@@ -10,6 +10,7 @@ import { ScrollArea } from '@radix-ui/react-scroll-area';
 
 const ChatUI = ({ props }) => {
     const scrollRef = useRef(null);
+    const inputRef = useRef(null);
     const { recieveMessage, username, setMessage, handleSubmit, message } = props
 
     useEffect(() => {
@@ -20,8 +21,7 @@ const ChatUI = ({ props }) => {
 
     const handleSubmitBtn = (e) => {
         e.preventDefault();
-        console.log("handle called inside")
-        handleSubmit()
+        handleSubmit(e)
     }
 
 
@@ -71,6 +71,7 @@ const ChatUI = ({ props }) => {
                 <form onSubmit={handleSubmit} className="flex-grow">
                     <Input
                         id="roomId"
+                        ref={inputRef}
                         placeholder="Enter text here..."
                         className="w-full"
                         value={message}
