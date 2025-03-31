@@ -107,8 +107,7 @@ const CbWhiteBoard = () => {
         socket.on("undo", () => requestAnimationFrame(() => canvasRef.current?.undo()));
         socket.on("redo", () => requestAnimationFrame(() => canvasRef.current?.redo()));
 
-        socket.on("lock", (user) => setLockedBy(user));
-        socket.on("unlock", () => setLockedBy(null));
+
         socket.on("message", (data) => { setRecieveMessage((prevmessages) => [...prevmessages, data]);});
         socket.on("cursor-move", ({ userId, cursor }) => {
             setCursors((prev) => ({ ...prev, [userId]: cursor }));
@@ -154,19 +153,6 @@ const CbWhiteBoard = () => {
         [username]
     );
 
-    const handleMouseDown = () => {
-        if (!lockedBy) {
-            setLockedBy(username);
-            socket.emit("lock", { roomId, username });
-        }
-    };
-
-    const handleMouseUp = () => {
-        if (lockedBy === username) {
-            setLockedBy(null);
-            socket.emit("unlock", { roomId });
-        }
-    };
 
     function formatTime(number) {
         return number < 10 ? '0' + number : number;
