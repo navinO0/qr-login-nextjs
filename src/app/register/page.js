@@ -172,7 +172,7 @@ const Register = () => {
                                 name="username"
                                 render={({ field }) => (
                                     <FormItem>
-                                        <FormLabel>Username</FormLabel>
+                                        <FormLabel>Username<span className="text-red-500 font-bold">*</span></FormLabel>
                                         <FormControl>
                                             <Input
                                                 placeholder="Username"
@@ -190,7 +190,7 @@ const Register = () => {
                                 name="password"
                                 render={({ field }) => (
                                     <FormItem>
-                                        <FormLabel>Password</FormLabel>
+                                        <FormLabel>Password<span className="text-red-500 font-bold">*</span></FormLabel>
                                         <FormControl>
                                             <Input
                                                 type="password"
@@ -211,7 +211,7 @@ const Register = () => {
                                 name="email"
                                 render={({ field }) => (
                                     <FormItem>
-                                        <FormLabel>Email</FormLabel>
+                                        <FormLabel>Email<span className="text-red-500 font-bold">*</span></FormLabel>
                                         <FormControl>
                                             <Input
                                                 placeholder="Email"
@@ -229,7 +229,7 @@ const Register = () => {
                                 name="mobile"
                                 render={({ field }) => (
                                     <FormItem>
-                                        <FormLabel>Mobile</FormLabel>
+                                        <FormLabel>Mobile<span className="text-red-500 font-bold">*</span></FormLabel>
                                         <FormControl>
                                             <Input
                                                 placeholder="Mobile"
@@ -250,7 +250,7 @@ const Register = () => {
                                 name="first_name"
                                 render={({ field }) => (
                                     <FormItem>
-                                        <FormLabel>First Name</FormLabel>
+                                        <FormLabel>First Name<span className="text-red-500 font-bold">*</span></FormLabel>
                                         <FormControl>
                                             <Input
                                                 placeholder="First Name"
