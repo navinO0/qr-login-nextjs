@@ -313,7 +313,7 @@ const CbWhiteBoard = () => {
                                 <div className="relative">
                                     Chat
                                     {unreadCount > 0 && (
-                                        <span className="absolute -top-5 -right-7 bg-red-600 text-white text-xs font-bold rounded-full px-2 py-0">
+                                        <span className="absolute -top-4 -right-7 bg-red-600 text-white text-xs font-bold rounded-full px-2 py-0">
                                             {unreadCount}
                                         </span>
                                     )}
