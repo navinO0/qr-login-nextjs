@@ -19,7 +19,7 @@ import ChatUI from "../../../core/chatUi";
 import ActiveUsers from "@/core/activeUsers";
 
 
-const socket = io(process.env.NEXT_PUBLIC_HOST ||  "http://localhost:3008", {
+const socket = io( "http://localhost:3008", {
     transports: ["websocket"],
 });
 
@@ -271,7 +271,7 @@ const CbWhiteBoard = () => {
                         {Object.keys(cursors).map((username) => {
                             const cursor = cursors[username];
                             return (
-                                <div key={username} className="absolute pointer-events-none" style={{ left: `${cursor.x}px`, top: `${cursor.y}px` }}>
+                                <div key={username} className="absolute pointer-events-none hidden md:block" style={{ left: `${cursor.x}px`, top: `${cursor.y}px` }}>
                                     <div className="w-4 h-4 border-2 rounded-full" style={{ borderColor: cursorColors.current[username] || "blue", backgroundColor: "rgba(255, 255, 255, 0.8)" }} />
                                     <p className="absolute -top-6 left-1/2 transform -translate-x-1/2 bg-gray-800 text-white text-xs px-2 py-1 rounded-md">{username}</p>
                                 </div>
