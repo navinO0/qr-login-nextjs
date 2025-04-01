@@ -11,11 +11,12 @@ import { ScrollArea } from '@radix-ui/react-scroll-area';
 const ChatUI = ({ props }) => {
     const scrollRef = useRef(null);
     const inputRef = useRef(null);
-    const { recieveMessage, username, setMessage, handleSubmit, message } = props
+    const { recieveMessage, username, setMessage, handleSubmit, message, handleChatOpen } = props
 
     useEffect(() => {
         if (scrollRef.current) {
             scrollRef.current.scrollTop = scrollRef.current.scrollHeight;
+            handleChatOpen()
         }
     }, [recieveMessage]);
 

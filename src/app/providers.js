@@ -1,13 +1,20 @@
-"use client"; 
+"use client"; // Important: This ensures the component is client-side
 
 import { SessionProvider } from "next-auth/react";
+import { createContext, useContext, useState } from "react";
 
-/*************  ✨ Codeium Command ⭐  *************/
-/**
- * Providers component wraps its children with a SessionProvider
-
-/******  d0e13c90-00b4-4dcb-a532-ff00ce85f5f9  *******/
+export const UserContext = createContext(null);
 
 export default function Providers({ children }) {
-  return <SessionProvider>{children}</SessionProvider>;
+  const [redirect, setRedirect] = useState("null"); 
+
+  return (
+    <SessionProvider>
+      <UserContext.Provider value={{ redirect, setRedirect }}>
+        {children}
+      </UserContext.Provider>
+    </SessionProvider>
+  );
 }
+
+export const useUserContext = () => useContext(UserContext);

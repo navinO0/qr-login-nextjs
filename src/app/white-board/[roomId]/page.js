@@ -17,9 +17,19 @@ import { PopoverDemo } from "@/core/popover";
 import useProtectedRoute from "@/core/protectedRoute";
 import ChatUI from "../../../core/chatUi";
 import ActiveUsers from "@/core/activeUsers";
+import {
+    Popover,
+    PopoverContent,
+    PopoverTrigger,
+} from "@/components/ui/popover"
+import { Card, CardContent } from "@/components/ui/card";
+import { cn } from "@/lib/utils";
+
+import { useUserContext } from "@/app/providers";
 
 
-const socket = io( process.env.NEXT_PUBLIC_HOST ||  "http://localhost:3008", {
+
+const socket = io(process.env.NEXT_PUBLIC_HOST_SOCKET || process.env.NEXT_PUBLIC_HOST || "http://localhost:3008", {
     transports: ["websocket"],
 });
 
@@ -40,9 +50,19 @@ const CbWhiteBoard = () => {
     const roomId = params?.roomId;
     const [recieveMessage, setRecieveMessage] = useState([{ id: '', message: '', userId: "", time: "" }]);
     const [message, setMessage] = useState("Hey yooo");
+
+    const [unreadCount, setUnreadCount] = useState(0);
+    const [lastMessage, setLastMessage] = useState({});
+    const [isChatOpen, setIsChatOpen] = useState(false);
+    const { setRedirect } = useUserContext();
+
     useEffect(() => {
         if (!roomId) {
             router.push("/white-board");
+        }
+        const token = Cookies.get("jwt_token");
+        if (!token) {
+            Cookies.set("redirect", `/white-board/${roomId}`)
         }
     }, [roomId, router]);
 
@@ -51,15 +71,15 @@ const CbWhiteBoard = () => {
             console.error("Room ID is not available");
             return;
         }
-    
+
         try {
             const token = Cookies.get("jwt_token"); // Get token from cookies
-    
+
             if (!token) {
                 console.error("No auth token found!");
                 return;
             }
-    
+
             const res = await axios.get(
                 `${process.env.NEXT_PUBLIC_HOST || "http://localhost:3009"}/wb/load/${roomId}`,
                 {
@@ -69,33 +89,33 @@ const CbWhiteBoard = () => {
                     withCredentials: true, // Ensure cookies are sent in cross-origin requests
                 }
             );
-    
+
             console.log(res.data.data);
-    
+
             // Ensure that messages exist and are an array before checking length
             if (res.data.data && Array.isArray(res.data.data.messages) && res.data.data.messages.length > 0) {
                 setRecieveMessage((prevData) => [...prevData, ...res.data.data.messages]);
             }
-    
+
         } catch (error) {
             console.error("Failed to load room data:", error);
         }
     };
-    
-    
+
+
 
     useEffect(() => {
         if (!roomId) return;
-    
+
         const token = Cookies.get("jwt_token");
         if (token) {
             const userData = parseToken(token);
             setUsername(userData.username);
         }
-    
+
         socket.emit("join-room", roomId);
         loadRoomData();
-    
+
         socket.on("draw", (compressedData) => {
             requestAnimationFrame(() => {
                 if (canvasRef.current) {
@@ -107,37 +127,45 @@ const CbWhiteBoard = () => {
                 }
             });
         });
-    
+
         socket.on("clear", () => {
             requestAnimationFrame(() => {
                 canvasRef.current?.clearCanvas();
                 window.location.reload();
             });
         });
-    
+
         socket.on("undo", () => {
             requestAnimationFrame(() => {
                 canvasRef.current?.undo();
             });
         });
-    
+
         socket.on("redo", () => {
             requestAnimationFrame(() => {
                 canvasRef.current?.redo();
             });
         });
-    
+
         socket.on("message", (data) => {
             setRecieveMessage((prevMessages) => [...prevMessages, data]);
+
+            // Increase unread count if chat is closed
+            if (!isChatOpen) {
+                setUnreadCount((prev) => prev + 1);
+            }
+
+            // Store last message
+            setLastMessage(data);
         });
-    
+
         socket.on("cursor-move", ({ userId, cursor }) => {
             setCursors((prev) => ({ ...prev, [userId]: cursor }));
             if (!cursorColors.current[userId]) {
                 cursorColors.current[userId] = `hsl(${Math.random() * 360}, 100%, 50%)`;
             }
         });
-    
+
         return () => {
             socket.off("draw");
             socket.off("clear");
@@ -148,7 +176,7 @@ const CbWhiteBoard = () => {
             socket.disconnect();
         };
     }, [roomId]);
-    
+
 
 
     const handleDraw = useCallback(
@@ -225,6 +253,15 @@ const CbWhiteBoard = () => {
         };
     }, [handleMouseMove, handleTouchMove]);
 
+    const handleChatOpen = () => {
+        setUnreadCount(0);
+        setIsChatOpen(true);
+    };
+
+    const handleChatClose = () => {
+        setIsChatOpen(false);
+    };
+
 
     return (
         <div className="border-black h-full">
@@ -243,9 +280,51 @@ const CbWhiteBoard = () => {
                         marginBottom: '10px'
                     }}>Room ID: {roomId}</span>
                     <div className="flex flex-wrap justify-end gap-3 mb-0 w-full border-b-0 sm:justify-center">
-                        <PopoverDemo buttonText="Chat">
-                            <ChatUI props={{ recieveMessage, username, setMessage, handleSubmit, message }} />
-                        </PopoverDemo>
+
+                        <Popover open={unreadCount > 0} className="!bg-transparent !shadow-none !border-none !p-0 !m-0 w-auto h-auto">
+
+                            <PopoverContent side="top"
+                                align="end"
+                                className="!p-0 !m-0 w-auto h-auto">
+                                <div
+                                    className={cn(
+                                        "flex p-1 my-1 w-full",
+                                        "justify-start"
+                                    )}
+                                >
+                                    <div className="relative flex flex-col align-start max-w-[80%] align-start items-start self-start justify-start">
+                                        <p className={cn(
+                                            "flex w-full text-[10px] font-semibold text-gray-500  ",
+                                            "justify-center"
+                                        )}>{lastMessage.userId}</p>
+                                        <div className={cn(
+                                            "rounded-lg p-0 min-w-[100px] text-sm break-words relative ",
+                                            // "bg-white text-black border-gray-300 after:absolute after:-left-2 after:top-2 after:w-0 after:h-0 after:border-r-8 after:border-r-white after:border-t-8 after:border-t-transparent after:border-b-8 after:border-b-transparent"
+                                        )}>
+                                            <CardContent className="p-2 flex flex-col gap-1">
+                                                <p className="text-xs leading-tight break-words">{lastMessage.message}</p>
+                                                <div className="text-[10px] text-right text-gray-400">{lastMessage.time}</div>
+                                            </CardContent>
+                                        </div>
+                                    </div>
+                                </div>
+                            </PopoverContent>
+                            <PopoverDemo buttonText={
+                                <div className="relative">
+                                    Chat
+                                    {unreadCount > 0 && (
+                                        <span className="absolute -top-5 -right-7 bg-red-600 text-white text-xs font-bold rounded-full px-2 py-0">
+                                            {unreadCount}
+                                        </span>
+                                    )}
+                                </div>
+                            }>
+
+                                <ChatUI props={{ recieveMessage, username, setMessage, handleSubmit, message, handleChatOpen }} />
+
+                            </PopoverDemo>
+                            <PopoverTrigger ></PopoverTrigger>
+                        </Popover>
                         <PopoverDemo buttonText="Users in the Room">
                             <ActiveUsers listUsers={Object.keys(cursors)} />
                         </PopoverDemo>
@@ -277,8 +356,8 @@ const CbWhiteBoard = () => {
                                 </div>
                             );
                         })}
-                        <ReactSketchCanvas ref={canvasRef} strokeWidth={eraser ? 20 : strokeWidth} strokeColor={eraser ? "#f8f9fa" : strokeColor} width="100%" height="100%" canvasColor="#f8f9fa" eraserWidth={20} onStroke={handleDraw} 
-                         />
+                        <ReactSketchCanvas ref={canvasRef} strokeWidth={eraser ? 20 : strokeWidth} strokeColor={eraser ? "#f8f9fa" : strokeColor} width="100%" height="100%" canvasColor="#f8f9fa" eraserWidth={20} onStroke={handleDraw}
+                        />
                     </div>
                 </div>
             </div>
