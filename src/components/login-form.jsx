@@ -122,7 +122,7 @@ export function LoginForm({ className, ...props }) {
       }
   };
   
-  const enableNextAuth = process.env.NEXT_AUTH_ENABLE
+  const enableNextAuth = process.env.NEXT_AUTH_ENABLE || false
 
   return (
     <div className={cn("flex flex-col gap-6", className)} {...props}>
