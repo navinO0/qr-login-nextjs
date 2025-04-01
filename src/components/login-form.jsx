@@ -120,7 +120,9 @@ export function LoginForm({ className, ...props }) {
       } else {
         Cookies.set("jwt_token", session?.jwt, { expires: 7 });
       }
-    };
+  };
+  
+  const enableNextAuth = process.env.NEXT_AUTH_ENABLE
 
   return (
     <div className={cn("flex flex-col gap-6", className)} {...props}>
@@ -191,20 +193,20 @@ export function LoginForm({ className, ...props }) {
               <Button type="button" onClick={form.handleSubmit(codeSubmit)} className="w-full cursor-pointer" disabled={isLoading1}>
                 {isLoading1 ? <MiniLoader /> : "Submit"}
               </Button>
-              <div className="flex flex-col gap-6">
-                    {!session ? (
-                      <Button onClick={handleLogin} className="w-full cursor-pointer" >
-                        Sign in with Google
-                      </Button>
-                    ) : (
-                      <div>
-                        <p>Welcome, {session.user?.name}!</p>
-                      <Button onClick={() => signOut()} className="w-full cursor-pointer">
-                          Logout
-                        </Button>
-                      </div>
-                    )}
+              {enableNextAuth && <div className="flex flex-col gap-6">
+                {!session ? (
+                  <Button onClick={handleLogin} className="w-full cursor-pointer" >
+                    Sign in with Google
+                  </Button>
+                ) : (
+                  <div>
+                    <p>Welcome, {session.user?.name}!</p>
+                    <Button onClick={() => signOut()} className="w-full cursor-pointer">
+                      Logout
+                    </Button>
                   </div>
+                )}
+              </div>}
               <ErroToaster message={error1} />
             </div>
           </div>

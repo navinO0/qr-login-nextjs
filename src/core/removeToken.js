@@ -2,7 +2,9 @@
 import Cookies from "js-cookie"
 const clearToken = () => {
     Cookies.remove('jwt_token')
-    // window.location.reload()
+    if (!process.env.NEXT_AUTH_ENABLE) {
+     window.location.reload()
+}
 }
 
 export default clearToken
