@@ -267,7 +267,7 @@ const CbWhiteBoard = () => {
                         <Qr_component roomId={roomId} />
                     </div>
 
-                    <div ref={containerRef} className="relative w-full h-[100vh] border" onMouseMove={handleMouseMove}>
+                    <div ref={containerRef} className="relative w-full h-full border" onMouseMove={handleMouseMove}>
                         {Object.keys(cursors).map((username) => {
                             const cursor = cursors[username];
                             return (
@@ -281,9 +281,6 @@ const CbWhiteBoard = () => {
                          />
                     </div>
                 </div>
-            </div>
-            <div className="flex-1 flex justify-center items-center relative w-[100%] h-[90vh]">
-                <h1>{recieveMessage[0].userId !== username && recieveMessage[0].message}</h1>
             </div>
             <div>
             </div>
