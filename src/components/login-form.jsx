@@ -18,17 +18,15 @@ import { useSession, signIn, signOut } from "next-auth/react";
 export function LoginForm({ className, ...props }) {
   const router = useRouter();
 
-  useEffect(() => {
-    async function fetchData() {
-      const token = Cookies.get("jwt_token");
-      if (token && (token !== "undefined" && token !== "null" && token !== undefined)) {
-        router.push("/");
-      }
-    }
-    
-
-    fetchData();
-  }, [router]);
+  // useEffect(() => {
+  //   async function fetchData() {
+  //     const token = Cookies.get("jwt_token");
+  //     if (token && (token !== "undefined" && token !== "null" && token !== undefined)) {
+  //       router.push("/");
+  //     }
+  //   }
+  //   fetchData();
+  // }, [router]);
   async function handleEncrypt(data) {
     return await encryptObjectValues(data, ['username', 'password']);
   }
@@ -195,13 +193,13 @@ export function LoginForm({ className, ...props }) {
               </Button>
               <div className="flex flex-col gap-6">
                     {!session ? (
-                      <Button onClick={handleLogin} className="w-full cursor-pointer" disabled >
+                      <Button onClick={handleLogin} className="w-full cursor-pointer" >
                         Sign in with Google
                       </Button>
                     ) : (
                       <div>
                         <p>Welcome, {session.user?.name}!</p>
-                        <Button onClick={() => signOut()} className="w-full cursor-pointer" disabled >
+                      <Button onClick={() => signOut()} className="w-full cursor-pointer">
                           Logout
                         </Button>
                       </div>

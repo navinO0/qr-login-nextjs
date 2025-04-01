@@ -11,7 +11,7 @@ export function PopoverDemo({ children, buttonText = "Open Dialog" }) {
         <DialogHeader>
           <DialogTitle>{buttonText}</DialogTitle>
         </DialogHeader>
-        <div className="overflow-y-auto max-h-[60vh]">{children}</div>
+        <div className="overflow-y-auto max-h-[80vh]">{children}</div>
       </DialogContent>
     </Dialog>
   );

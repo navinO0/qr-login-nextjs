@@ -35,7 +35,7 @@ const ChatUI = ({ props }) => {
                 {/* Ensure ScrollArea has a defined height and smooth scrolling */}
                 <ScrollArea
                     ref={scrollRef}
-                    className="h-[200px] overflow-y-auto scrollbar-thin scrollbar-thumb-gray-400 scrollbar-track-transparent scrollbar-rounded-lg"
+                    className="h-[400px] overflow-y-auto scrollbar-thin scrollbar-thumb-gray-400 scrollbar-track-transparent scrollbar-rounded-lg"
                 >
                     {recieveMessage.map((message) => (
                         <div

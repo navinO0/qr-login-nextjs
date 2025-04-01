@@ -47,6 +47,11 @@ const CbWhiteBoard = () => {
     }, [roomId, router]);
 
     const loadRoomData = async () => {
+        if (!roomId) {
+            console.error("Room ID is not available");
+            return;
+        }
+    
         try {
             const token = Cookies.get("jwt_token"); // Get token from cookies
     
@@ -65,27 +70,32 @@ const CbWhiteBoard = () => {
                 }
             );
     
-            if (res.data.data.length > 0) {
-                setRecieveMessage((prevData) => [...prevData, ...res.data.data]);
+            console.log(res.data.data);
+    
+            // Ensure that messages exist and are an array before checking length
+            if (res.data.data && Array.isArray(res.data.data.messages) && res.data.data.messages.length > 0) {
+                setRecieveMessage((prevData) => [...prevData, ...res.data.data.messages]);
             }
+    
         } catch (error) {
             console.error("Failed to load room data:", error);
         }
     };
+    
+    
 
     useEffect(() => {
         if (!roomId) return;
+    
         const token = Cookies.get("jwt_token");
-        let userData;
-
         if (token) {
-            userData = parseToken(token);
+            const userData = parseToken(token);
             setUsername(userData.username);
         }
+    
         socket.emit("join-room", roomId);
-
-        loadRoomData()
-
+        loadRoomData();
+    
         socket.on("draw", (compressedData) => {
             requestAnimationFrame(() => {
                 if (canvasRef.current) {
@@ -97,31 +107,48 @@ const CbWhiteBoard = () => {
                 }
             });
         });
-
-
-        socket.on("clear", () => requestAnimationFrame(() => {
-            canvasRef.current?.clearCanvas();
-            window.location.reload();
-        }));
-
-        socket.on("undo", () => requestAnimationFrame(() => canvasRef.current?.undo()));
-        socket.on("redo", () => requestAnimationFrame(() => canvasRef.current?.redo()));
-
-
-        socket.on("message", (data) => { setRecieveMessage((prevmessages) => [...prevmessages, data]);});
+    
+        socket.on("clear", () => {
+            requestAnimationFrame(() => {
+                canvasRef.current?.clearCanvas();
+                window.location.reload();
+            });
+        });
+    
+        socket.on("undo", () => {
+            requestAnimationFrame(() => {
+                canvasRef.current?.undo();
+            });
+        });
+    
+        socket.on("redo", () => {
+            requestAnimationFrame(() => {
+                canvasRef.current?.redo();
+            });
+        });
+    
+        socket.on("message", (data) => {
+            setRecieveMessage((prevMessages) => [...prevMessages, data]);
+        });
+    
         socket.on("cursor-move", ({ userId, cursor }) => {
             setCursors((prev) => ({ ...prev, [userId]: cursor }));
             if (!cursorColors.current[userId]) {
                 cursorColors.current[userId] = `hsl(${Math.random() * 360}, 100%, 50%)`;
             }
         });
-
+    
         return () => {
-            socket.off("draw").off("clear").off("undo").off("redo").off("cursor-move");
+            socket.off("draw");
+            socket.off("clear");
+            socket.off("undo");
+            socket.off("redo");
+            socket.off("message");
+            socket.off("cursor-move");
             socket.disconnect();
         };
     }, [roomId]);
-
+    
 
 
     const handleDraw = useCallback(
@@ -129,9 +156,9 @@ const CbWhiteBoard = () => {
             if (!canvasRef.current || lockedBy && lockedBy !== username) return;
             const paths = await canvasRef.current.exportPaths();
             const newStrokes = paths[paths.length - 1];
-            socket.emit("draw", { roomId, username, paths: [newStrokes] });
+            socket.emit("draw", { roomId, userId: username || username || `user`, paths: [newStrokes] });
         }, 50),
-        [lockedBy]
+        [username]
     );
 
     const handleSync = useCallback(
@@ -168,6 +195,35 @@ const CbWhiteBoard = () => {
             setMessage("")
         }
     };
+
+    const handleTouchMove = useCallback(
+        throttle((e) => {
+            if (!containerRef.current) return;
+            const { left, top } = containerRef.current.getBoundingClientRect();
+            const touch = e.touches[0];
+            const cursor = {
+                x: touch.clientX - left,
+                y: touch.clientY - top,
+            };
+            socket.emit("cursor-move", { roomId, userId: username || username || `user`, cursor });
+        }, 5),
+        [username]
+    );
+
+    useEffect(() => {
+        if (!containerRef.current) return;
+        const container = containerRef.current;
+
+        // Add mousemove and touchmove event listeners
+        container.addEventListener("mousemove", handleMouseMove);
+        container.addEventListener("touchmove", handleTouchMove, { passive: true });
+
+        // Cleanup event listeners
+        return () => {
+            container.removeEventListener("mousemove", handleMouseMove);
+            container.removeEventListener("touchmove", handleTouchMove);
+        };
+    }, [handleMouseMove, handleTouchMove]);
 
 
     return (
@@ -211,7 +267,7 @@ const CbWhiteBoard = () => {
                         <Qr_component roomId={roomId} />
                     </div>
 
-                    <div ref={containerRef} className="relative w-full h-full border" onMouseMove={handleMouseMove}>
+                    <div ref={containerRef} className="relative w-full h-[100vh] border" onMouseMove={handleMouseMove}>
                         {Object.keys(cursors).map((username) => {
                             const cursor = cursors[username];
                             return (
@@ -221,8 +277,8 @@ const CbWhiteBoard = () => {
                                 </div>
                             );
                         })}
-                        <ReactSketchCanvas ref={canvasRef} strokeWidth={eraser ? 20 : strokeWidth} strokeColor={eraser ? "#f8f9fa" : strokeColor} width="100%" height="100%" canvasColor="#f8f9fa" eraserWidth={20} onStroke={handleDraw} onMouseDown={handleMouseDown}
-                            onMouseUp={handleMouseUp} />
+                        <ReactSketchCanvas ref={canvasRef} strokeWidth={eraser ? 20 : strokeWidth} strokeColor={eraser ? "#f8f9fa" : strokeColor} width="100%" height="100%" canvasColor="#f8f9fa" eraserWidth={20} onStroke={handleDraw} 
+                         />
                     </div>
                 </div>
             </div>

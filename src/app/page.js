@@ -6,6 +6,7 @@ import Cookies from "js-cookie";
 import parseToken from "@/core/parseJson";
 import { useRouter } from "next/navigation";
 import { useSession } from "next-auth/react";
+import registerUser from "@/core/registerUser";
 
 
 const UserContext = createContext();
@@ -15,7 +16,8 @@ export default function Home() {
   const { data: session } = useSession();
   useEffect(() => {
    if(session?.user?.token && session?.user?.token !== "undefined"){
-    Cookies.set("jwt_token", session.user.token);
+     Cookies.set("jwt_token", session.user.token);
+     const resp = registerUser(session.user, ['username', 'email', 'first_name'])
    }
     const token = Cookies.get("jwt_token");
     if (token) {

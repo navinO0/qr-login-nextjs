@@ -16,8 +16,8 @@ import { signOut } from "next-auth/react";
 
 export function CloseAlert() {
     const clearTokenBtn = () => {
+        signOut({ callbackUrl: `${process.env.NEXT_PUBLIC_HOST_QR}/login` });
         clearToken()
-        // signOut({ callbackUrl: `${process.env.NEXT_PUBLIC_HOST_QR}/login` });
     }
     
     return (
