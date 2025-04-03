@@ -27,11 +27,8 @@ import { cn } from "@/lib/utils";
 
 import { useUserContext } from "@/app/providers";
 
+let socket;
 
-
-const socket = io(process.env.NEXT_PUBLIC_HOST_SOCKET || process.env.NEXT_PUBLIC_HOST || "http://localhost:3008", {
-    transports: ["websocket"],
-});
 
 const CbWhiteBoard = () => {
     useProtectedRoute()
@@ -80,15 +77,27 @@ const CbWhiteBoard = () => {
                 return;
             }
 
-            const res = await axios.get(
-                `${process.env.NEXT_PUBLIC_HOST || "http://localhost:3009"}/wb/load/${roomId}`,
-                {
-                    headers: {
-                        Authorization: `Bearer ${token}`, // Send token in header
-                    },
-                    withCredentials: true, // Ensure cookies are sent in cross-origin requests
+            try {
+                const res = await axios.get(
+                    `${process.env.NEXT_PUBLIC_HOST || "http://localhost:3009"}/wb/load/${roomId}`,
+                    {
+                        headers: {
+                            Authorization: `Bearer ${token}`, // Ensure token is sent properly
+                        },
+                        withCredentials: true, // Needed if auth depends on cookies
+                    }
+                );
+            
+                // Handle success
+                return res.data.data;
+            } catch (error) {
+                if (error.response && error.response.status === 401) {
+                    router.push("/session-expired");
+                    removeToken();
+                } else {
+                    console.error("Error fetching whiteboard data:", error);
                 }
-            );
+            }
 
             console.log(res.data.data);
 
@@ -106,14 +115,20 @@ const CbWhiteBoard = () => {
 
     useEffect(() => {
         if (!roomId) return;
-
+        let userData = {}
         const token = Cookies.get("jwt_token");
         if (token) {
-            const userData = parseToken(token);
+             userData = parseToken(token);
             setUsername(userData.username);
         }
+        socket = io(process.env.NEXT_PUBLIC_HOST_SOCKET || process.env.NEXT_PUBLIC_HOST || "http://localhost:3008", {
+            transports: ["websocket"],
+            query: {
+                username: userData.username || username ,
+            },
+        });
 
-        socket.emit("join-room", roomId);
+        socket.emit("join-room", (roomId));
         loadRoomData();
 
         socket.on("draw", (compressedData) => {
