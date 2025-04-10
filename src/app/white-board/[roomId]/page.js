@@ -5,7 +5,7 @@ import { ReactSketchCanvas } from "react-sketch-canvas";
 import React, { useRef, useCallback, useEffect, useState } from "react";
 import axios from "axios";
 import { set, throttle } from "lodash";
-import { MdOutlineUndo, MdOutlineSync, MdOutlineRedo, MdOutlineClear } from "react-icons/md";
+import { MdOutlineUndo, MdOutlineSync, MdOutlineRedo, MdOutlineClear, MdOutlineDownload } from "react-icons/md";
 import { FaEraser, FaPen } from "react-icons/fa";
 import { Button } from "@/components/ui/button";
 import { Slider } from "@/components/ui/slider";
@@ -26,6 +26,8 @@ import { Card, CardContent } from "@/components/ui/card";
 import { cn } from "@/lib/utils";
 
 import { useUserContext } from "@/app/providers";
+import getRandomColor from "@/core/getRandomColor";
+
 
 let socket;
 
@@ -36,18 +38,18 @@ const CbWhiteBoard = () => {
     const containerRef = useRef(null);
     const cursorColors = useRef({});
     const [cursors, setCursors] = useState({});
-    const [strokeColor, setStrokeColor] = useState("#000000");
+    const [strokeColor, setStrokeColor] = useState( getRandomColor());
     const [strokeWidth, setStrokeWidth] = useState(4);
     const [eraser, setEraser] = useState(false);
     const [localPaths, setLocalPaths] = useState([]);
-    const [lockedBy, setLockedBy] = useState(null); // Lock state
+    const [lockedBy, setLockedBy] = useState(null);
     const params = useParams();
     const router = useRouter();
     const [username, setUsername] = useState(() => Math.floor(Math.random() * 100000));
     const roomId = params?.roomId;
     const [recieveMessage, setRecieveMessage] = useState([{ id: '', message: '', userId: "", time: "" }]);
     const [message, setMessage] = useState("Hey yooo");
-
+    const [sketchHistory, setSketchHistory] = useState([])
     const [unreadCount, setUnreadCount] = useState(0);
     const [lastMessage, setLastMessage] = useState({});
     const [isChatOpen, setIsChatOpen] = useState(false);
@@ -70,7 +72,7 @@ const CbWhiteBoard = () => {
         }
 
         try {
-            const token = Cookies.get("jwt_token"); // Get token from cookies
+            const token = Cookies.get("jwt_token");
 
             if (!token) {
                 console.error("No auth token found!");
@@ -82,14 +84,28 @@ const CbWhiteBoard = () => {
                     `${process.env.NEXT_PUBLIC_HOST || "http://localhost:3009"}/wb/load/${roomId}`,
                     {
                         headers: {
-                            Authorization: `Bearer ${token}`, // Ensure token is sent properly
+                            Authorization: `Bearer ${token}`,
                         },
-                        withCredentials: true, // Needed if auth depends on cookies
+                        withCredentials: true,
                     }
                 );
-            
-                // Handle success
-                return res.data.data;
+
+                if (res.data.data && Array.isArray(res.data.data.messages) && res.data.data.messages.length > 0) {
+                    setRecieveMessage((prevData) => [...prevData, ...res.data.data.messages]);
+                }
+
+                if (res.data.data && Array.isArray(res.data.data.drowData) && res.data?.data?.drowData?.length > 0) {
+                    // setSketchHistory(res.data.data.drowData);  
+                    setLocalPaths((prevPaths) => {
+                        const updatedPaths = [...prevPaths || [], ...res.data.data.drowData || []];
+                        requestAnimationFrame(() => {
+                            canvasRef.current?.loadPaths(updatedPaths);
+                        });
+                        return updatedPaths;
+                    });
+                }
+
+                // return res.data.data;
             } catch (error) {
                 if (error.response && error.response.status === 401) {
                     router.push("/session-expired");
@@ -99,12 +115,7 @@ const CbWhiteBoard = () => {
                 }
             }
 
-            console.log(res.data.data);
 
-            // Ensure that messages exist and are an array before checking length
-            if (res.data.data && Array.isArray(res.data.data.messages) && res.data.data.messages.length > 0) {
-                setRecieveMessage((prevData) => [...prevData, ...res.data.data.messages]);
-            }
 
         } catch (error) {
             console.error("Failed to load room data:", error);
@@ -112,19 +123,18 @@ const CbWhiteBoard = () => {
     };
 
 
-
     useEffect(() => {
         if (!roomId) return;
         let userData = {}
         const token = Cookies.get("jwt_token");
         if (token) {
-             userData = parseToken(token);
+            userData = parseToken(token);
             setUsername(userData.username);
         }
         socket = io(process.env.NEXT_PUBLIC_HOST_SOCKET || process.env.NEXT_PUBLIC_HOST || "http://localhost:3008", {
             transports: ["websocket"],
             query: {
-                username: userData.username || username ,
+                username: userData.username || username,
             },
         });
 
@@ -146,7 +156,7 @@ const CbWhiteBoard = () => {
         socket.on("clear", () => {
             requestAnimationFrame(() => {
                 canvasRef.current?.clearCanvas();
-                window.location.reload();
+                setLocalPaths([]);
             });
         });
 
@@ -165,12 +175,10 @@ const CbWhiteBoard = () => {
         socket.on("message", (data) => {
             setRecieveMessage((prevMessages) => [...prevMessages, data]);
 
-            // Increase unread count if chat is closed
             if (!isChatOpen) {
                 setUnreadCount((prev) => prev + 1);
             }
 
-            // Store last message
             setLastMessage(data);
         });
 
@@ -273,8 +281,18 @@ const CbWhiteBoard = () => {
         setIsChatOpen(true);
     };
 
-    const handleChatClose = () => {
-        setIsChatOpen(false);
+    const exportImage = async (canvasInstance) => {
+        if (!canvasInstance) return;
+
+        try {
+            const imageData = await canvasInstance.exportImage("png"); // returns base64 string
+            const link = document.createElement("a");
+            link.href = imageData;
+            link.download = `whiteboard-${roomId}.png`;
+            link.click();
+        } catch (err) {
+            console.error("Failed to export image:", err);
+        }
     };
 
 
@@ -357,7 +375,10 @@ const CbWhiteBoard = () => {
                         <Button onClick={handleSync} variant="Ghost"><MdOutlineSync /></Button>
                         <Button onClick={() => { canvasRef.current?.undo(); socket.emit("undo", roomId); }} variant="Ghost"><MdOutlineUndo /></Button>
                         <Button onClick={() => { canvasRef.current?.redo(); socket.emit("redo", roomId); }} variant="Ghost"><MdOutlineRedo /></Button>
-                        <Button onClick={() => { canvasRef.current?.clearCanvas(); socket.emit("clear", roomId); window.location.reload(); }} variant="Ghost"><MdOutlineClear /></Button>
+                        <Button onClick={() => { canvasRef.current?.clearCanvas(); socket.emit("clear", roomId); setLocalPaths([]) }} variant="Ghost"><MdOutlineClear /></Button>
+                        <Button onClick={() => canvasRef.current && exportImage(canvasRef.current)} variant="ghost">
+                            <MdOutlineDownload />
+                        </Button>
                         <Qr_component roomId={roomId} />
                     </div>
 

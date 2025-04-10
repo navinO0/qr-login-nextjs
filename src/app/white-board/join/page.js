@@ -6,25 +6,25 @@ import { Input } from "@/components/ui/input";
 import { Button } from "@/components/ui/button";
 import { Label } from "@/components/ui/label";
 import { useState, useEffect, useCallback } from "react";
-import axios from "axios";
-import Cookies from "js-cookie";
-import Stack from "@mui/material/Stack";
-import Autocomplete from "@mui/material/Autocomplete";
-import TextField from "@mui/material/TextField";
+import { useRouter } from "next/navigation";
 
 const JoinRoom = () => {
       const [roomId, setRoomId] = useState("");
       const [password, setPassword] = useState("");
-      const [passwordRequired, setPasswordRequired] = useState(false);
+  const [passwordRequired, setPasswordRequired] = useState(false);
+  const [isLoading, setIsLoading] = useState(false);
+  const router = useRouter()
       const handleSubmit = (e) => {
         e.preventDefault();
-        if (!roomId || !password) {
-          alert("Room ID and Password are required!");
-          return;
-        }
+        setIsLoading(true)
+        // if (!roomId || !password) {
+        //   alert("Room ID and Password are required!");
+        //   return;
+        // }
     
-        console.log("Joining Room:", { roomId, password, selectedUsers });
+        // console.log("Joining Room:", { roomId, password, selectedUsers });
         // Here, you can send data to your backend API for joining the room
+        router.push(`/white-board/${roomId}`)
       };
     return (
         <Card className="w-[400px]">
@@ -58,7 +58,7 @@ const JoinRoom = () => {
           </form>
         </CardContent>
         <CardFooter className="flex justify-between">
-          <Button onClick={handleSubmit}>Join Room</Button>
+          <Button onClick={handleSubmit} cursor="pointer">{isLoading ? "Joining..." : "Join Room"}</Button>
         </CardFooter>
       </Card>
     )

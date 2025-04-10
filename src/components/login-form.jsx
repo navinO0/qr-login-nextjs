@@ -117,8 +117,9 @@ export function LoginForm({ className, ...props }) {
       const res = await signIn("google");
       if (res?.error) {
         console.error("Login failed", res.error);
-      } else {
-        Cookies.set("jwt_token", session?.jwt, { expires: 7 });
+      }
+      else {
+        Cookies.set("jwt_token", session?.user?.token, { expires: 7 });
       }
   };
   
@@ -200,7 +201,7 @@ export function LoginForm({ className, ...props }) {
                   </Button>
                 ) : (
                   <div>
-                    <p>Welcome, {session.user?.name}!</p>
+                    {/* <p>Welcome, {session.user?.name}!</p> */}
                     <Button onClick={() => signOut()} className="w-full cursor-pointer">
                       Logout
                     </Button>

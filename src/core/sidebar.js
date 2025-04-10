@@ -24,7 +24,7 @@ const items = [
   },
   {
     title: "White Board",
-    url: "/white-board",
+    url: "/white-board/join",
     icon: Pencil,
   },
   {
