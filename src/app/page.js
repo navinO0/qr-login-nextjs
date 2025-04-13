@@ -8,6 +8,7 @@ import { useSession } from "next-auth/react";
 import registerUser from "@/core/registerUser";
 import { useUserContext } from "./providers";
 import { useRouter } from "next/navigation";
+import LandingPage from "@/core/landingPage";
 
 
 const UserContext = createContext();
@@ -39,13 +40,7 @@ export default function Home() {
   }, [userData]);
   useProtectedRoute();
   return (
-      <div className="flex">
-        <div className="flex justify-center items-center h-[90vh] w-[100%] ">
-          <img
-           src={"https://res.cloudinary.com/dzapdxkgc/image/upload/v1743199597/Lovepik_com-380422385-smart-payment-method-illustration-qr-code-scan-code-payment-simple-retail_wzyehm.png"}
-           alt="Home Image"
-           className="w-100 h-100 object-cover "/>
-        </div>
-      </div>
+
+    <LandingPage />
   );
 }

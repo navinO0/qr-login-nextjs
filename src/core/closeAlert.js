@@ -22,21 +22,29 @@ export function CloseAlert() {
     
     return (
         <AlertDialog>
-            <AlertDialogTrigger asChild>
-                <Button variant="outline">Logout</Button>
-            </AlertDialogTrigger>
-            <AlertDialogContent>
-                <AlertDialogHeader>
-                    <AlertDialogTitle>Are you absolutely sure?</AlertDialogTitle>
-                    <AlertDialogDescription>
-                        Want to logout ?
-                    </AlertDialogDescription>
-                </AlertDialogHeader>
-                <AlertDialogFooter>
-                    <AlertDialogCancel>Cancel</AlertDialogCancel>
-                    <AlertDialogAction onClick={clearTokenBtn}>Logout</AlertDialogAction>
-                </AlertDialogFooter>
-            </AlertDialogContent>
-        </AlertDialog>
+      <AlertDialogTrigger asChild>
+        <Button variant="outline" className="px-6 py-2 bg-blue-600 text-white hover:bg-blue-500 rounded-md">
+          Logout
+        </Button>
+      </AlertDialogTrigger>
+      <AlertDialogContent className="w-[400px] rounded-lg bg-white shadow-lg p-6">
+        <AlertDialogHeader>
+          <AlertDialogTitle className="text-xl font-semibold text-gray-800">Are you absolutely sure?</AlertDialogTitle>
+          <AlertDialogDescription className="text-sm text-gray-600">
+            Want to logout?
+          </AlertDialogDescription>
+        </AlertDialogHeader>
+        <AlertDialogFooter className="flex justify-end space-x-4">
+          <AlertDialogCancel className="px-4 py-2 bg-gray-300 text-gray-700 hover:bg-gray-400 rounded-md">
+            Cancel
+          </AlertDialogCancel>
+          <AlertDialogAction 
+            onClick={clearTokenBtn} 
+            className="px-6 py-2 bg-red-600 text-white hover:bg-red-500 rounded-md">
+            Logout
+          </AlertDialogAction>
+        </AlertDialogFooter>
+      </AlertDialogContent>
+    </AlertDialog>
     )
 }

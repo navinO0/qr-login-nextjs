@@ -7,61 +7,128 @@ import { Button } from "@/components/ui/button";
 import { Label } from "@/components/ui/label";
 import { useState, useEffect, useCallback } from "react";
 import { useRouter } from "next/navigation";
+import clearToken from "@/core/removeToken";
+import Cookies from "js-cookie";
+import axios from "axios";
 
 const JoinRoom = () => {
-      const [roomId, setRoomId] = useState("");
-      const [password, setPassword] = useState("");
+  const [roomId, setRoomId] = useState("");
+  const [password, setPassword] = useState("");
   const [passwordRequired, setPasswordRequired] = useState(false);
   const [isLoading, setIsLoading] = useState(false);
   const router = useRouter()
-      const handleSubmit = (e) => {
-        e.preventDefault();
-        setIsLoading(true)
-        // if (!roomId || !password) {
-        //   alert("Room ID and Password are required!");
-        //   return;
-        // }
-    
-        // console.log("Joining Room:", { roomId, password, selectedUsers });
-        // Here, you can send data to your backend API for joining the room
+  const handleSubmit = async (e) => {
+    e.preventDefault();
+    setIsLoading(true)
+    if (!roomId || roomId.trimEnd().length === 0) {
+      alert("Room ID is required!");
+      setIsLoading(false)
+    }
+    // else {
+    //   // router.push(`/white-board/${roomId}`)
+    // }
+    try {
+      setIsLoading(true);
+      const token = Cookies.get("jwt_token");
+
+      if (!token) {
+        clearToken();
+        setIsLoading(false);
+        return;
+      }
+
+      const response = await axios.post(
+        `${process.env.NEXT_PUBLIC_HOST || "http://127.0.0.1:3000"}/wb/room/join`,
+        { room_id: roomId, password },
+        {
+          headers: {
+            "Content-Type": "application/json",
+            "Accept": "application/json",
+            "Authorization": `Bearer ${token}`,
+          },
+          validateStatus: () => true,
+        }
+      );
+
+      console.log("response", response);
+
+      if (response.status === 404) {
+        setPasswordRequired(true);
+      }
+      if (response.status === 400 && response.data.code === "PASSWORD_REQUIRED") {
+        setPasswordRequired(true);
+      }
+
+      if (response.status === 200) {
         router.push(`/white-board/${roomId}`)
-      };
-    return (
-        <Card className="w-[400px]">
+      }
+
+    } catch (error) {
+      console.error("Error:", error);
+    } finally {
+      setIsLoading(false);
+    }
+
+    if (!roomId || (passwordRequired && !password)) {
+      alert("Since Room is private, Room ID and Password are required!");
+      return;
+    }
+
+    // console.log("Joining Room:", { roomId, password, selectedUsers });
+    // Here, you can send data to your backend API for joining the room
+
+  };
+  return (
+    <div className="flex items-center justify-center min-h-screen bg-gradient-to-tr from-slate-900 to-slate-800 p-4">
+      <Card className="w-full max-w-md shadow-2xl border border-slate-700 bg-slate-900 text-white">
         <CardHeader>
-          <CardTitle>Join a Room</CardTitle>
-          <CardDescription>Enter details to start collaborating.</CardDescription>
+          <CardTitle className="text-2xl text-white">🔗 Join a Collaboration Room</CardTitle>
+          <CardDescription className="text-gray-400">
+            Enter the room ID and password (if required) to start collaborating in real time.
+          </CardDescription>
         </CardHeader>
         <CardContent>
           <form onSubmit={handleSubmit} className="space-y-4">
             <div className="flex flex-col space-y-1.5">
-              <Label htmlFor="roomId">Room ID</Label>
+              <Label htmlFor="roomId" className="text-gray-300">Room ID</Label>
               <Input
                 id="roomId"
-                placeholder="Enter Room ID"
+                className="bg-slate-800 text-white placeholder-gray-500 border-slate-700"
+                placeholder="e.g. 1234-5678"
                 value={roomId}
                 onChange={(e) => setRoomId(e.target.value)}
                 required
               />
-                    </div>
-                    {passwordRequired && <div className="flex flex-col space-y-1.5">
-                        <Label htmlFor="password">Password</Label>
-                        <Input
-                            id="password"
-                            type="password"
-                            placeholder="Enter Room Password"
-                            value={password}
-                            onChange={(e) => setPassword(e.target.value)}
-                            required
-                        />
-                    </div>}
+            </div>
+
+            {passwordRequired && (
+              <div className="flex flex-col space-y-1.5">
+                <Label htmlFor="password" className="text-gray-300">Room Password</Label>
+                <Input
+                  id="password"
+                  type="password"
+                  className="bg-slate-800 text-white placeholder-gray-500 border-slate-700"
+                  placeholder="Enter password"
+                  value={password}
+                  onChange={(e) => setPassword(e.target.value)}
+                  required
+                />
+              </div>
+            )}
           </form>
         </CardContent>
         <CardFooter className="flex justify-between">
-          <Button onClick={handleSubmit} cursor="pointer">{isLoading ? "Joining..." : "Join Room"}</Button>
+          <Button
+            onClick={handleSubmit}
+            className="w-full bg-blue-600 hover:bg-blue-700 transition-colors"
+            disabled={isLoading}
+          >
+            {isLoading ? "Joining..." : "Join Room"}
+          </Button>
         </CardFooter>
       </Card>
-    )
+    </div>
+  )
 };
 
 export default JoinRoom

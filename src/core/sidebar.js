@@ -14,6 +14,7 @@ import {
   SidebarMenuButton,
   SidebarMenuItem,
 } from "@/components/ui/sidebar";
+import { Button } from "@/components/ui/button";
 
 // Menu items
 const items = [
@@ -24,7 +25,7 @@ const items = [
   },
   {
     title: "White Board",
-    url: "/white-board/join",
+    url: "/white-board",
     icon: Pencil,
   },
   {
@@ -35,7 +36,7 @@ const items = [
 ];
 
 export function AppSidebar() {
- const [visible, setVisible] = useState(false);
+  const [visible, setVisible] = useState(false);
 
   useEffect(() => {
     const checkToken = () => {
@@ -45,33 +46,33 @@ export function AppSidebar() {
 
     checkToken(); // Check token on mount
 
-    const interval = setInterval(checkToken, 1000); // Polling every second
-    return () => clearInterval(interval); // Cleanup on unmount
+    const interval = setInterval(checkToken, 1000);
+    return () => clearInterval(interval); 
   }, []);
 
   if (!visible) return null;
   return (
     <Sidebar variant="sidebar" collapsible="icon">
-      <SidebarContent>
-        <SidebarGroup>
-          <SidebarGroupLabel>Application</SidebarGroupLabel>
-          <SidebarGroupContent>
-            <SidebarMenu>
-              {items.map((item) => (
-                <SidebarMenuItem key={item.title}>
-                  <SidebarMenuButton asChild>
-                    <a href={item.url} className="flex items-center gap-2">
-                      <item.icon className="w-5 h-5" /> {/* Properly sized icon */}
-                      <span>{item.title}</span>
-                    </a>
-                  </SidebarMenuButton>
-                </SidebarMenuItem>
-              ))}
-            </SidebarMenu>
-          </SidebarGroupContent>
-        </SidebarGroup>
-      </SidebarContent>
-    </Sidebar>
+    <SidebarContent className="h-full bg-gray-800 text-white">
+      <SidebarGroup>
+        <SidebarGroupLabel className="text-lg text-gray-400 py-4 px-6">Application</SidebarGroupLabel>
+        <SidebarGroupContent>
+          <SidebarMenu>
+            {items.map((item) => (
+              <SidebarMenuItem key={item.title} className="hover:bg-gray-700 rounded-md">
+                <SidebarMenuButton asChild>
+                  <a href={item.url} className="flex items-center gap-2 px-6 py-2">
+                    <item.icon className="w-5 h-5" /> 
+                    <span>{item.title}</span>
+                  </a>
+                </SidebarMenuButton>
+              </SidebarMenuItem>
+            ))}
+          </SidebarMenu>
+        </SidebarGroupContent>
+      </SidebarGroup>
+    </SidebarContent>
+  </Sidebar>
   );
 }
 

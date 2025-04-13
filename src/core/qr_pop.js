@@ -10,6 +10,7 @@ import {
     AlertDialogTitle,
     AlertDialogTrigger,
 } from "@/components/ui/alert-dialog"
+import { MdOutlineQrCode2 } from "react-icons/md";
 import { Button } from "@/components/ui/button"
 
 import React from 'react';
@@ -24,12 +25,8 @@ return (
     <div>
             <AlertDialog>
             <AlertDialogTrigger asChild>
-                <span  className="cursor-pointer flex items-end gap-2 justify-end ">
-                    <img
-                        alt="Scan QR Code"
-                        src="https://res.cloudinary.com/dzapdxkgc/image/upload/v1742564270/qrcode-scan-svgrepo-com_lcxjjd.svg"
-                        className="h-5 w-5"
-                    />
+                <span  className="cursor-pointer flex items-end gap-2 justify-end text-white">
+                    <MdOutlineQrCode2 />
                     <span className="hidden md:inline">Colloborate</span>
                 </span>
             </AlertDialogTrigger>

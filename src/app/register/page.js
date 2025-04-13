@@ -146,195 +146,200 @@ const Register = () => {
 
 
     return (
-        <div className="flex min-h-svh flex-col items-center justify-center bg-muted p-6 md:p-10">
+        <div className="flex min-h-svh flex-col items-center justify-center bg-slate-900 p-6 md:p-10">
 
+  <div className="max-w-3xl mx-auto p-8 bg-slate-800 rounded-lg shadow-lg space-y-6">
+    <h2 className="text-3xl font-semibold text-center text-white mb-8">User Registration</h2>
 
-            <div className="max-w-3xl mx-auto p-8 bg-white rounded-lg shadow-lg space-y-6 ">
-                <h2 className="text-3xl font-semibold text-center text-grey-600 mb-8">User Registration</h2>
+    {successMessage && (
+      <div className="">
+        <ErroToaster message={successMessage} success={true} />
+      </div>
+    )}
 
-                {successMessage && (
-                    <div className="">
-                        <ErroToaster message={successMessage} success={true} />
-                    </div>
-                )}
+    {error && (
+      <div className="">
+        <ErroToaster message={error} />
+      </div>
+    )}
 
-                {error && (
-                    <div className="">
-                        <ErroToaster message={error} />
-                    </div>
-                )}
+    <Form {...form}>
+      <form onSubmit={form.handleSubmit(onSubmit)} className="space-y-6">
+        <div className="grid grid-cols-1 sm:grid-cols-2 gap-6">
+          <FormField
+            control={form.control}
+            name="username"
+            render={({ field }) => (
+              <FormItem>
+                <FormLabel className="text-white">Username<span className="text-red-500 font-bold">*</span></FormLabel>
+                <FormControl>
+                  <Input
+                    placeholder="Username"
+                    className="w-full p-3 border border-gray-600 rounded-md focus:outline-none focus:ring-2 focus:ring-blue-500 text-white bg-slate-700"
+                    {...field}
+                  />
+                </FormControl>
+                <FormMessage />
+              </FormItem>
+            )}
+          />
 
-                <Form {...form}>
-                    <form onSubmit={form.handleSubmit(onSubmit)} className="space-y-6">
-                        <div className="grid grid-cols-1 sm:grid-cols-2 gap-6">
-                            <FormField
-                                control={form.control}
-                                name="username"
-                                render={({ field }) => (
-                                    <FormItem>
-                                        <FormLabel>Username<span className="text-red-500 font-bold">*</span></FormLabel>
-                                        <FormControl>
-                                            <Input
-                                                placeholder="Username"
-                                                className="w-full p-3 border border-gray-300 rounded-md focus:outline-none focus:ring-2 focus:ring-blue-500"
-                                                {...field}
-                                            />
-                                        </FormControl>
-                                        <FormMessage />
-                                    </FormItem>
-                                )}
-                            />
-
-                            <FormField
-                                control={form.control}
-                                name="password"
-                                render={({ field }) => (
-                                    <FormItem>
-                                        <FormLabel>Password<span className="text-red-500 font-bold">*</span></FormLabel>
-                                        <FormControl>
-                                            <Input
-                                                type="password"
-                                                placeholder="Password"
-                                                className="w-full p-3 border border-gray-300 rounded-md focus:outline-none focus:ring-2 focus:ring-blue-500"
-                                                {...field}
-                                            />
-                                        </FormControl>
-                                        <FormMessage />
-                                    </FormItem>
-                                )}
-                            />
-                        </div>
-
-                        <div className="grid grid-cols-1 sm:grid-cols-2 gap-6">
-                            <FormField
-                                control={form.control}
-                                name="email"
-                                render={({ field }) => (
-                                    <FormItem>
-                                        <FormLabel>Email<span className="text-red-500 font-bold">*</span></FormLabel>
-                                        <FormControl>
-                                            <Input
-                                                placeholder="Email"
-                                                className="w-full p-3 border border-gray-300 rounded-md focus:outline-none focus:ring-2 focus:ring-blue-500"
-                                                {...field}
-                                            />
-                                        </FormControl>
-                                        <FormMessage />
-                                    </FormItem>
-                                )}
-                            />
-
-                            <FormField
-                                control={form.control}
-                                name="mobile"
-                                render={({ field }) => (
-                                    <FormItem>
-                                        <FormLabel>Mobile<span className="text-red-500 font-bold">*</span></FormLabel>
-                                        <FormControl>
-                                            <Input
-                                                placeholder="Mobile"
-                                                className="w-full p-3 border border-gray-300 rounded-md focus:outline-none focus:ring-2 focus:ring-blue-500"
-                                                {...field}
-                                            />
-                                        </FormControl>
-                                        <FormMessage />
-                                    </FormItem>
-                                )}
-                            />
-                        </div>
-
-                        {/* Name Fields */}
-                        <div className="grid grid-cols-1 sm:grid-cols-2 gap-6">
-                            <FormField
-                                control={form.control}
-                                name="first_name"
-                                render={({ field }) => (
-                                    <FormItem>
-                                        <FormLabel>First Name<span className="text-red-500 font-bold">*</span></FormLabel>
-                                        <FormControl>
-                                            <Input
-                                                placeholder="First Name"
-                                                className="w-full p-3 border border-gray-300 rounded-md focus:outline-none focus:ring-2 focus:ring-blue-500"
-                                                {...field}
-                                            />
-                                        </FormControl>
-                                        <FormMessage />
-                                    </FormItem>
-                                )}
-                            />
-
-                            <FormField
-                                control={form.control}
-                                name="middle_name"
-                                render={({ field }) => (
-                                    <FormItem>
-                                        <FormLabel>Middle Name</FormLabel>
-                                        <FormControl>
-                                            <Input
-                                                placeholder="Middle Name"
-                                                className="w-full p-3 border border-gray-300 rounded-md focus:outline-none focus:ring-2 focus:ring-blue-500"
-                                                {...field}
-                                            />
-                                        </FormControl>
-                                        <FormMessage />
-                                    </FormItem>
-                                )}
-                            />
-                        </div>
-
-                        <div className="grid grid-cols-1 sm:grid-cols-2 gap-6">
-                            <FormField
-                                control={form.control}
-                                name="last_name"
-                                render={({ field }) => (
-                                    <FormItem>
-                                        <FormLabel>Last Name</FormLabel>
-                                        <FormControl>
-                                            <Input
-                                                placeholder="Last Name"
-                                                className="w-full p-3 border border-gray-300 rounded-md focus:outline-none focus:ring-2 focus:ring-blue-500"
-                                                {...field}
-                                            />
-                                        </FormControl>
-                                        <FormMessage />
-                                    </FormItem>
-                                )}
-
-                            />
-                            <FormField
-                                control={form.control}
-                                name="profile_picture"
-                                render={({ field }) => (
-                                    <FormItem>
-                                        <FormLabel>Profile Picture</FormLabel>
-                                        <FormControl>
-                                            <Input type="file" accept="image/*" onClick={handleFileBlur} onChange={handleFileChange} />
-                                        </FormControl>
-                                        <FormLabel className={"text-grey-500 margin-top-0 opacity-50"}>*Image size should not ecxceed 2MB</FormLabel>
-                                        <FormMessage />
-                                    </FormItem>
-                                )}
-
-                            />
-                        </div>
-
-                        <Button
-                            type="submit"
-                            className="w-full py-3 mt-6 text-white bg-black hover:bg-gray-600 rounded-md hover:bg-light-700 focus:outline-none cursor-pointer"
-                            disabled={loading}
-                        >
-                            {loading ? <MiniLoader text='Registering...' /> : 'Register'}
-                        </Button>
-                    </form>
-                </Form>
-                <Button
-                    className="w-full py-3 mt-0 text-white bg-black hover:bg-gray-600 rounded-md hover:bg-light-700 focus:outline-none cursor-pointer"
-                    onClick={redirectToLogin}
-                >
-                    Registered already? Login
-                </Button>
-            </div>
+          <FormField
+            control={form.control}
+            name="password"
+            render={({ field }) => (
+              <FormItem>
+                <FormLabel className="text-white">Password<span className="text-red-500 font-bold">*</span></FormLabel>
+                <FormControl>
+                  <Input
+                    type="password"
+                    placeholder="Password"
+                    className="w-full p-3 border border-gray-600 rounded-md focus:outline-none focus:ring-2 focus:ring-blue-500 text-white bg-slate-700"
+                    {...field}
+                  />
+                </FormControl>
+                <FormMessage />
+              </FormItem>
+            )}
+          />
         </div>
+
+        <div className="grid grid-cols-1 sm:grid-cols-2 gap-6">
+          <FormField
+            control={form.control}
+            name="email"
+            render={({ field }) => (
+              <FormItem>
+                <FormLabel className="text-white">Email<span className="text-red-500 font-bold">*</span></FormLabel>
+                <FormControl>
+                  <Input
+                    placeholder="Email"
+                    className="w-full p-3 border border-gray-600 rounded-md focus:outline-none focus:ring-2 focus:ring-blue-500 text-white bg-slate-700"
+                    {...field}
+                  />
+                </FormControl>
+                <FormMessage />
+              </FormItem>
+            )}
+          />
+
+          <FormField
+            control={form.control}
+            name="mobile"
+            render={({ field }) => (
+              <FormItem>
+                <FormLabel className="text-white">Mobile<span className="text-red-500 font-bold">*</span></FormLabel>
+                <FormControl>
+                  <Input
+                    placeholder="Mobile"
+                    className="w-full p-3 border border-gray-600 rounded-md focus:outline-none focus:ring-2 focus:ring-blue-500 text-white bg-slate-700"
+                    {...field}
+                  />
+                </FormControl>
+                <FormMessage />
+              </FormItem>
+            )}
+          />
+        </div>
+
+        {/* Name Fields */}
+        <div className="grid grid-cols-1 sm:grid-cols-2 gap-6">
+          <FormField
+            control={form.control}
+            name="first_name"
+            render={({ field }) => (
+              <FormItem>
+                <FormLabel className="text-white">First Name<span className="text-red-500 font-bold">*</span></FormLabel>
+                <FormControl>
+                  <Input
+                    placeholder="First Name"
+                    className="w-full p-3 border border-gray-600 rounded-md focus:outline-none focus:ring-2 focus:ring-blue-500 text-white bg-slate-700"
+                    {...field}
+                  />
+                </FormControl>
+                <FormMessage />
+              </FormItem>
+            )}
+          />
+
+          <FormField
+            control={form.control}
+            name="middle_name"
+            render={({ field }) => (
+              <FormItem>
+                <FormLabel className="text-white">Middle Name</FormLabel>
+                <FormControl>
+                  <Input
+                    placeholder="Middle Name"
+                    className="w-full p-3 border border-gray-600 rounded-md focus:outline-none focus:ring-2 focus:ring-blue-500 text-white bg-slate-700"
+                    {...field}
+                  />
+                </FormControl>
+                <FormMessage />
+              </FormItem>
+            )}
+          />
+        </div>
+
+        <div className="grid grid-cols-1 sm:grid-cols-2 gap-6">
+          <FormField
+            control={form.control}
+            name="last_name"
+            render={({ field }) => (
+              <FormItem>
+                <FormLabel className="text-white">Last Name</FormLabel>
+                <FormControl>
+                  <Input
+                    placeholder="Last Name"
+                    className="w-full p-3 border border-gray-600 rounded-md focus:outline-none focus:ring-2 focus:ring-blue-500 text-white bg-slate-700"
+                    {...field}
+                  />
+                </FormControl>
+                <FormMessage />
+              </FormItem>
+            )}
+          />
+          <FormField
+            control={form.control}
+            name="profile_picture"
+            render={({ field }) => (
+              <FormItem>
+                <FormLabel className="text-white">Profile Picture</FormLabel>
+                <FormControl>
+                  <Input
+                    type="file"
+                    accept="image/*"
+                    onClick={handleFileBlur}
+                    onChange={handleFileChange}
+                    className="bg-slate-700 text-white"
+                  />
+                </FormControl>
+                <FormLabel className="text-gray-500 opacity-50 mt-2">*Image size should not exceed 2MB</FormLabel>
+                <FormMessage />
+              </FormItem>
+            )}
+          />
+        </div>
+
+        <Button
+          type="submit"
+          className="w-full py-3 mt-6 text-white bg-black hover:bg-gray-600 rounded-md focus:outline-none cursor-pointer"
+          disabled={loading}
+        >
+          {loading ? <MiniLoader text='Registering...' /> : 'Register'}
+        </Button>
+      </form>
+    </Form>
+
+    <Button
+      className="w-full py-3 mt-0 text-white bg-black hover:bg-gray-600 rounded-md focus:outline-none cursor-pointer"
+      onClick={redirectToLogin}
+    >
+      Already Registered? Login
+    </Button>
+  </div>
+</div>
+
     );
 };
 

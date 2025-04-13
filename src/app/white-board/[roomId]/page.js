@@ -1,11 +1,11 @@
 "use client";
-
+import { v4 as uuidv4 } from 'uuid';
 import { useRouter, useParams } from "next/navigation";
 import { ReactSketchCanvas } from "react-sketch-canvas";
 import React, { useRef, useCallback, useEffect, useState } from "react";
 import axios from "axios";
 import { set, throttle } from "lodash";
-import { MdOutlineUndo, MdOutlineSync, MdOutlineRedo, MdOutlineClear, MdOutlineDownload } from "react-icons/md";
+import { MdOutlineUndo, MdOutlineSync, MdOutlineRedo, MdOutlineClear, MdOutlineDownload, MdOutlineQrCode2 } from "react-icons/md";
 import { FaEraser, FaPen } from "react-icons/fa";
 import { Button } from "@/components/ui/button";
 import { Slider } from "@/components/ui/slider";
@@ -29,6 +29,7 @@ import { useUserContext } from "@/app/providers";
 import getRandomColor from "@/core/getRandomColor";
 
 
+
 let socket;
 
 
@@ -38,7 +39,7 @@ const CbWhiteBoard = () => {
     const containerRef = useRef(null);
     const cursorColors = useRef({});
     const [cursors, setCursors] = useState({});
-    const [strokeColor, setStrokeColor] = useState( getRandomColor());
+    const [strokeColor, setStrokeColor] = useState(getRandomColor());
     const [strokeWidth, setStrokeWidth] = useState(4);
     const [eraser, setEraser] = useState(false);
     const [localPaths, setLocalPaths] = useState([]);
@@ -49,15 +50,13 @@ const CbWhiteBoard = () => {
     const roomId = params?.roomId;
     const [recieveMessage, setRecieveMessage] = useState([{ id: '', message: '', userId: "", time: "" }]);
     const [message, setMessage] = useState("Hey yooo");
-    const [sketchHistory, setSketchHistory] = useState([])
     const [unreadCount, setUnreadCount] = useState(0);
     const [lastMessage, setLastMessage] = useState({});
     const [isChatOpen, setIsChatOpen] = useState(false);
-    const { setRedirect } = useUserContext();
 
     useEffect(() => {
         if (!roomId) {
-            router.push("/white-board");
+            router.push("/white-board/join");
         }
         const token = Cookies.get("jwt_token");
         if (!token) {
@@ -240,9 +239,7 @@ const CbWhiteBoard = () => {
         e.preventDefault()
         if (message.trim() !== "") {
             const now = new Date();
-            const hours = formatTime(now.getHours());
-            const minutes = formatTime(now.getMinutes());
-            socket.emit("message", { id: (Math.random() * 100000), roomId, userId: username, message: message, time: `${hours}:${minutes}` });
+            socket.emit("message", { id: uuidv4(), room_id: roomId, sender_username: username, content: message, sent_at: now });
             setMessage("")
         }
     };
@@ -285,7 +282,7 @@ const CbWhiteBoard = () => {
         if (!canvasInstance) return;
 
         try {
-            const imageData = await canvasInstance.exportImage("png"); // returns base64 string
+            const imageData = await canvasInstance.exportImage("png");
             const link = document.createElement("a");
             link.href = imageData;
             link.download = `whiteboard-${roomId}.png`;
@@ -297,11 +294,10 @@ const CbWhiteBoard = () => {
 
 
     return (
-        <div className="border-black h-full">
-            <div className="flex justify-center items-center h-[90vh]">
-
-                <div className="flex flex-col items-center p-2 w-[95%] h-[90%] border border-gray-300 rounded-tr-[10px] rounded-tl-[10px]">
-                    <h2 className="text-xl font-semibold mb-4">Collaborative Whiteboard</h2>
+        <div className="border-black h-full bg-gradient-to-br from-slate-900 to-slate-800">
+            <div className=" flex justify-center items-center h-[100vh]">
+                <div className="flex flex-col items-center p-2 w-[95%] h-[90%] border border-slate-700 bg-slate-900 rounded-tr-[10px] rounded-tl-[10px]">
+                    <h2 className="text-2xl font-semibold mb-4 text-white">Collaborative Whiteboard</h2>
                     <span style={{
                         backgroundColor: 'rgba(0, 0, 0, 0.73)',
                         opacity: 0.8,
@@ -315,25 +311,11 @@ const CbWhiteBoard = () => {
                     <div className="flex flex-wrap justify-end gap-3 mb-0 w-full border-b-0 sm:justify-center">
 
                         <Popover open={unreadCount > 0} className="!bg-transparent !shadow-none !border-none !p-0 !m-0 w-auto h-auto">
-
-                            <PopoverContent side="top"
-                                align="end"
-                                className="!p-0 !m-0 w-auto h-auto">
-                                <div
-                                    className={cn(
-                                        "flex p-1 my-1 w-full",
-                                        "justify-start"
-                                    )}
-                                >
+                            <PopoverContent side="top" align="end" className="!p-0 !m-0 w-auto h-auto">
+                                <div className={cn("flex p-1 my-1 w-full", "justify-start")}>
                                     <div className="relative flex flex-col align-start max-w-[80%] align-start items-start self-start justify-start">
-                                        <p className={cn(
-                                            "flex w-full text-[10px] font-semibold text-gray-500  ",
-                                            "justify-center"
-                                        )}>{lastMessage.userId}</p>
-                                        <div className={cn(
-                                            "rounded-lg p-0 min-w-[100px] text-sm break-words relative ",
-                                            // "bg-white text-black border-gray-300 after:absolute after:-left-2 after:top-2 after:w-0 after:h-0 after:border-r-8 after:border-r-white after:border-t-8 after:border-t-transparent after:border-b-8 after:border-b-transparent"
-                                        )}>
+                                        <p className={cn("flex w-full text-[10px] font-semibold text-gray-500", "justify-center")}>{lastMessage.userId}</p>
+                                        <div className={cn("rounded-lg p-0 min-w-[100px] text-sm break-words relative")}>
                                             <CardContent className="p-2 flex flex-col gap-1">
                                                 <p className="text-xs leading-tight break-words">{lastMessage.message}</p>
                                                 <div className="text-[10px] text-right text-gray-400">{lastMessage.time}</div>
@@ -344,7 +326,7 @@ const CbWhiteBoard = () => {
                             </PopoverContent>
                             <PopoverDemo buttonText={
                                 <div className="relative">
-                                    Chat
+                                    <span className="text-black">Chat</span>
                                     {unreadCount > 0 && (
                                         <span className="absolute -top-4 -right-7 bg-red-600 text-white text-xs font-bold rounded-full px-2 py-0">
                                             {unreadCount}
@@ -352,12 +334,11 @@ const CbWhiteBoard = () => {
                                     )}
                                 </div>
                             }>
-
                                 <ChatUI props={{ recieveMessage, username, setMessage, handleSubmit, message, handleChatOpen }} />
-
                             </PopoverDemo>
-                            <PopoverTrigger ></PopoverTrigger>
+                            <PopoverTrigger></PopoverTrigger>
                         </Popover>
+
                         <PopoverDemo buttonText="Users in the Room">
                             <ActiveUsers listUsers={Object.keys(cursors)} />
                         </PopoverDemo>
@@ -368,21 +349,33 @@ const CbWhiteBoard = () => {
                             step={1}
                             value={[strokeWidth]}
                             onValueChange={(value) => setStrokeWidth(value[0])}
-                            className="w-[20%] min-w-[120px]"
+                            className="w-[20%] min-w-[120px] text-white" // Adding text-white here for better visibility
                         />
                         <input type="color" value={strokeColor} onChange={(e) => setStrokeColor(e.target.value)} className="cursor-pointer" disabled={eraser} />
-                        <Button onClick={() => setEraser(!eraser)} variant="Ghost">{eraser ? <FaPen /> : <FaEraser />}</Button>
-                        <Button onClick={handleSync} variant="Ghost"><MdOutlineSync /></Button>
-                        <Button onClick={() => { canvasRef.current?.undo(); socket.emit("undo", roomId); }} variant="Ghost"><MdOutlineUndo /></Button>
-                        <Button onClick={() => { canvasRef.current?.redo(); socket.emit("redo", roomId); }} variant="Ghost"><MdOutlineRedo /></Button>
-                        <Button onClick={() => { canvasRef.current?.clearCanvas(); socket.emit("clear", roomId); setLocalPaths([]) }} variant="Ghost"><MdOutlineClear /></Button>
-                        <Button onClick={() => canvasRef.current && exportImage(canvasRef.current)} variant="ghost">
-                            <MdOutlineDownload />
+
+                        {/* Adding icon color changes */}
+                        <Button onClick={() => setEraser(!eraser)} variant="Ghost" className="text-white">
+                            {eraser ? <FaPen className="text-white" /> : <FaEraser className="text-white" />}
+                        </Button>
+                        <Button onClick={handleSync} variant="Ghost" className="text-white">
+                            <MdOutlineSync className="text-white" />
+                        </Button>
+                        <Button onClick={() => { canvasRef.current?.undo(); socket.emit("undo", roomId); }} variant="Ghost" className="text-white">
+                            <MdOutlineUndo className="text-white" />
+                        </Button>
+                        <Button onClick={() => { canvasRef.current?.redo(); socket.emit("redo", roomId); }} variant="Ghost" className="text-white">
+                            <MdOutlineRedo className="text-white" />
+                        </Button>
+                        <Button onClick={() => { canvasRef.current?.clearCanvas(); socket.emit("clear", roomId); setLocalPaths([]) }} variant="Ghost" className="text-white">
+                            <MdOutlineClear className="text-white" />
+                        </Button>
+                        <Button onClick={() => canvasRef.current && exportImage(canvasRef.current)} variant="Ghost" className="text-white">
+                            <MdOutlineDownload className="text-white" />
                         </Button>
                         <Qr_component roomId={roomId} />
                     </div>
 
-                    <div ref={containerRef} className="relative w-full h-full border" onMouseMove={handleMouseMove}>
+                    <div ref={containerRef} className="relative w-full h-full border-slate-700" onMouseMove={handleMouseMove}>
                         {Object.keys(cursors).map((username) => {
                             const cursor = cursors[username];
                             return (
@@ -400,6 +393,7 @@ const CbWhiteBoard = () => {
             <div>
             </div>
         </div>
+
     );
 };
 
