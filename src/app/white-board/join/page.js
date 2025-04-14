@@ -10,23 +10,25 @@ import { useRouter } from "next/navigation";
 import clearToken from "@/core/removeToken";
 import Cookies from "js-cookie";
 import axios from "axios";
+import ErroToaster from "@/core/errorToaster";
+import useProtectedRoute from "@/core/protectedRoute";
 
 const JoinRoom = () => {
   const [roomId, setRoomId] = useState("");
   const [password, setPassword] = useState("");
   const [passwordRequired, setPasswordRequired] = useState(false);
   const [isLoading, setIsLoading] = useState(false);
+  const [error,setError] = useState(null)
   const router = useRouter()
+  useProtectedRoute()
   const handleSubmit = async (e) => {
     e.preventDefault();
+    setError(null)
     setIsLoading(true)
     if (!roomId || roomId.trimEnd().length === 0) {
-      alert("Room ID is required!");
+      setError("Room ID is required!");
       setIsLoading(false)
     }
-    // else {
-    //   // router.push(`/white-board/${roomId}`)
-    // }
     try {
       setIsLoading(true);
       const token = Cookies.get("jwt_token");
@@ -50,13 +52,16 @@ const JoinRoom = () => {
         }
       );
 
-      console.log("response", response);
-
       if (response.status === 404) {
         setPasswordRequired(true);
       }
       if (response.status === 400 && response.data.code === "PASSWORD_REQUIRED") {
+        setError("Since this is private room please enter password")
         setPasswordRequired(true);
+      }
+
+      if (response.status === 400&& response.data.code === "INVALID_PASSWORD") {
+        setError("Invalid password please try again.")
       }
 
       if (response.status === 200) {
@@ -70,13 +75,9 @@ const JoinRoom = () => {
     }
 
     if (!roomId || (passwordRequired && !password)) {
-      alert("Since Room is private, Room ID and Password are required!");
+      setError("Since Room is private, Room ID and Password are required!");
       return;
     }
-
-    // console.log("Joining Room:", { roomId, password, selectedUsers });
-    // Here, you can send data to your backend API for joining the room
-
   };
   return (
     <div className="flex items-center justify-center min-h-screen bg-gradient-to-tr from-slate-900 to-slate-800 p-4">
@@ -127,6 +128,7 @@ const JoinRoom = () => {
           </Button>
         </CardFooter>
       </Card>
+      {error && <ErroToaster message={error} />}
     </div>
   )
 };

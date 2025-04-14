@@ -11,6 +11,7 @@ import Stack from "@mui/material/Stack";
 import Autocomplete from "@mui/material/Autocomplete";
 import TextField from "@mui/material/TextField";
 import { useRouter } from "next/navigation";
+import ErroToaster from "@/core/errorToaster";
 
 export default function RoomCard() {
   const [roomId, setRoomId] = useState("");
@@ -19,9 +20,9 @@ export default function RoomCard() {
   const [userSuggestions, setUserSuggestions] = useState([]);
   const [typingTimeout, setTypingTimeout] = useState(null);
   const [selectedUsers, setSelectedUsers] = useState([]);
+  const [error, setError] = useState(null)
 
   const router = useRouter()
-  // Fetch user suggestions with a delay
   const fetchUserData = useCallback(async () => {
     try {
       const token = Cookies.get("jwt_token");
@@ -32,12 +33,15 @@ export default function RoomCard() {
         },
       };
 
-      const response = await axios.get(
-        `${process.env.NEXT_PUBLIC_HOST || "http://localhost:3009"}/wb/get/users/${userKeyword}`,
-        options
-      );
+      if (userKeyword.trim().length > 3) {
+        const response = await axios.get(
+          `${process.env.NEXT_PUBLIC_HOST || "http://localhost:3009"}/wb/get/users/${userKeyword}`,
+          options
+        );
 
-      setUserSuggestions(response.data.data.users || []);
+        setUserSuggestions(response.data.data.users || []);
+      }
+
     } catch (err) {
       console.error("Fetch user data failed", err);
     }
@@ -63,23 +67,23 @@ export default function RoomCard() {
   // Handle form submission
   const handleSubmit = async (e) => {
     e.preventDefault();
-    
+setError(null)
     if (!roomId || !password) {
       alert("Room ID and Password are required!");
       return;
     }
-  
-    const token = Cookies.get("jwt_token"); 
-  
-    const requestBody = { 
-      room_id : roomId, 
-      password : password.length === 0 ? '' : password, 
-      is_private : password.length === 0 ? false : true, 
-      participants: selectedUsers.length === 0 ? [] : selectedUsers 
+
+    const token = Cookies.get("jwt_token");
+
+    const requestBody = {
+      room_id: roomId,
+      password: password.length === 0 ? '' : password,
+      is_private: password.length === 0 ? false : true,
+      participants: selectedUsers.length === 0 ? [] : selectedUsers
     };
-  
-   
-  
+
+
+
     try {
       const options = {
         headers: {
@@ -90,8 +94,8 @@ export default function RoomCard() {
       };
 
       const createResponse = await axios.post(
-        `${process.env.NEXT_PUBLIC_HOST || "http://localhost:3009"}/wb/room/create`, 
-        requestBody,  
+        `${process.env.NEXT_PUBLIC_HOST || "http://localhost:3009"}/wb/room/create`,
+        requestBody,
         options,
       );
 
@@ -99,14 +103,15 @@ export default function RoomCard() {
         console.log("Room created successfully:", createResponse.data);
         router.push(`/white-board/${roomId}`);
       }
-  
-      console.log("Room Created:", createResponse.data);
+
+      
     } catch (err) {
+     setError(err?.response?.data?.message)
       console.error("Error creating room:", err);
     }
-  
+
   };
-  
+
 
   return (
     <div className="flex items-center justify-center min-h-screen bg-gradient-to-tr from-slate-900 to-slate-800 p-4">
@@ -151,20 +156,47 @@ export default function RoomCard() {
                   id="inviteUsers"
                   freeSolo
                   options={userSuggestions.map((user) => user.username || "")}
-                  renderInput={(params) => (
-                    <TextField {...params} label="Search & invite users" variant="outlined" />
-                  )}
+                  value={selectedUsers}
                   onInputChange={(event, newValue) => setUserKeyword(newValue)}
                   onChange={(event, newValue) => setSelectedUsers(newValue)}
-                  value={selectedUsers}
+                  renderInput={(params) => (
+                    <TextField
+                      {...params}
+                      label="Search & invite users"
+                      variant="outlined"
+                      sx={{
+                        input: { color: 'white' },
+                        label: { color: 'gray.300' },
+                        '& .MuiOutlinedInput-root': {
+                          '& fieldset': {
+                            borderColor: 'gray',
+                          },
+                          '&:hover fieldset': {
+                            borderColor: 'white',
+                          },
+                          '&.Mui-focused fieldset': {
+                            borderColor: 'white',
+                          },
+                        },
+                        '& .MuiInputLabel-root': {
+                          color: 'white',
+                        },
+                        '& .MuiAutocomplete-tag': {
+                          backgroundColor: '#1f2937', 
+                          color: 'white',
+                        },
+                      }}
+                    />
+                  )}
                 />
               </Stack>
               {selectedUsers.length > 0 && (
-                <CardDescription className="text-green-400 text-sm mt-1">
+                <p className="text-green-400 text-sm mt-1">
                   Selected: {selectedUsers.join(", ")}
-                </CardDescription>
+                </p>
               )}
             </div>
+
           </form>
         </CardContent>
         <CardFooter>
@@ -176,6 +208,7 @@ export default function RoomCard() {
           </Button>
         </CardFooter>
       </Card>
+      {error && <ErroToaster message={error} />}
     </div>
   );
 }
