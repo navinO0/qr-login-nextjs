@@ -1,8 +1,10 @@
 "use client";
+import useProtectedRoute from '@/core/protectedRoute';
 // pages/index.js
 import Head from 'next/head';
 
 export default function Home() {
+  useProtectedRoute()
   return (
     <>
       <Head>

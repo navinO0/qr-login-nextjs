@@ -17,16 +17,17 @@ import { useSession, signIn, signOut } from "next-auth/react";
 
 export function LoginForm({ className, ...props }) {
   const router = useRouter();
+  const { data: session } = useSession();
 
-  // useEffect(() => {
-  //   async function fetchData() {
-  //     const token = Cookies.get("jwt_token");
-  //     if (token && (token !== "undefined" && token !== "null" && token !== undefined)) {
-  //       router.push("/");
-  //     }
-  //   }
-  //   fetchData();
-  // }, [router]);
+  useEffect(() => {
+    async function fetchData() {
+      const token = Cookies.get("jwt_token");
+      if (!token && session) {
+       signOut()
+      }
+    }
+    fetchData();
+  }, [router]);
   async function handleEncrypt(data) {
     return await encryptObjectValues(data, ['username', 'password']);
   }
@@ -112,14 +113,14 @@ export function LoginForm({ className, ...props }) {
     }
   };
 
-  const { data: session } = useSession();
+ 
     const handleLogin = async () => {
       const res = await signIn("google");
       if (res?.error) {
         console.error("Login failed", res.error);
       }
       else {
-        Cookies.set("jwt_token", session?.user?.token, { expires: 7 });
+        Cookies.set("jwt_token", session?.user?.token || null, { expires: 7 });
       }
   };
   

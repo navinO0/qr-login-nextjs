@@ -34,7 +34,6 @@ let socket;
 
 
 const CbWhiteBoard = () => {
-    useProtectedRoute()
     const canvasRef = useRef(null);
     const containerRef = useRef(null);
     const cursorColors = useRef({});
@@ -292,6 +291,7 @@ const CbWhiteBoard = () => {
         }
     };
 
+    useProtectedRoute()
 
     return (
         <div className="border-black h-full bg-gradient-to-br from-slate-900 to-slate-800">

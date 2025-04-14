@@ -79,6 +79,7 @@ const JoinRoom = () => {
       return;
     }
   };
+  useProtectedRoute()
   return (
     <div className="flex items-center justify-center min-h-screen bg-gradient-to-tr from-slate-900 to-slate-800 p-4">
       <Card className="w-full max-w-md shadow-2xl border border-slate-700 bg-slate-900 text-white">

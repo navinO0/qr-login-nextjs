@@ -12,6 +12,7 @@ import Autocomplete from "@mui/material/Autocomplete";
 import TextField from "@mui/material/TextField";
 import { useRouter } from "next/navigation";
 import ErroToaster from "@/core/errorToaster";
+import useProtectedRoute from "@/core/protectedRoute";
 
 export default function RoomCard() {
   const [roomId, setRoomId] = useState("");
@@ -64,7 +65,7 @@ export default function RoomCard() {
     }
   }, [userKeyword, fetchUserData]);
 
-  // Handle form submission
+  useProtectedRoute()
   const handleSubmit = async (e) => {
     e.preventDefault();
 setError(null)
@@ -111,7 +112,6 @@ setError(null)
     }
 
   };
-
 
   return (
     <div className="flex items-center justify-center min-h-screen bg-gradient-to-tr from-slate-900 to-slate-800 p-4">
