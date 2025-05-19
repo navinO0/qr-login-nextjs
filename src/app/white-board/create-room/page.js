@@ -100,6 +100,12 @@ setError(null)
         options,
       );
 
+      if (response.status === 401) {
+        Cookies.remove('jwt_token');
+        router.push("/session-expired");
+        clearToken()
+      }
+
       if (createResponse.status === 200) {
         console.log("Room created successfully:", createResponse.data);
         router.push(`/white-board/${roomId}`);

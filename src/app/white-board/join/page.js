@@ -52,6 +52,12 @@ const JoinRoom = () => {
         }
       );
 
+      if (response.status === 401) {
+        Cookies.remove('jwt_token');
+        router.push("/session-expired");
+        clearToken()
+      }
+
       if (response.status === 404) {
         setPasswordRequired(true);
       }
