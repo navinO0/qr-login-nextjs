@@ -1,44 +1,44 @@
-
-
-
 "use client";
 
-import { useRouter } from 'next/navigation'; // Or 'next/router' for previous versions
 import Cookies from 'js-cookie';
-
+import { getDeviceInfo } from './getDeviceInfo';
 
 const loginWithCodeFunc = async (loginCode) => {
     if (!loginCode) {
         console.error('No login code provided');
-        return false;
+        return { status: false, message: 'No login code provided' };
     }
 
-    // const router = useRouter(); // Make sure to initialize router
-
     try {
+        const deviceInfo = await getDeviceInfo();
+        console.log('Device Info:', deviceInfo);
+
         const response = await fetch(`${process.env.NEXT_PUBLIC_HOST || "http://127.0.0.1:3000"}/user/login/code/${loginCode}`, {
             method: 'POST',
             headers: {
                 'Accept': 'application/json',
+                'Content-Type': 'application/json',
             },
+            body: JSON.stringify({ device_info: deviceInfo }),
         });
-        if (response.ok) {
-            const resp = await response.json();
-            const token = resp.data.token;
 
-            Cookies.set('jwt_token', token, { expires: 1 }); // Store token for 1 day
-            if (resp.status === 'false') {
-                return { status: false, message: resp.message };
+        const resp = await response.json();
+
+        if (response.ok) {
+            const token = resp?.data?.token;
+
+            if (token) {
+                Cookies.set('jwt_token', token, { expires: 1 });
+                return { status: true, message: 'Login success' };
+            } else {
+                return { status: false, message: 'Token missing in response' };
             }
-            return { status: true, message: 'login success' };
         } else {
-            const errorData = await response.json();
-            return { status: false, message: errorData.message };
+            return { status: false, message: resp?.message || 'Login failed' };
         }
     } catch (error) {
         console.error('Login failed:', error);
-        return { status: false, message: "login failed" };
-
+        return { status: false, message: "Login failed due to an error" };
     }
 };
 

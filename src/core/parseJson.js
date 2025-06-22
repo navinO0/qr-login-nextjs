@@ -5,7 +5,7 @@ import Cookies from "js-cookie";
 
 
 export default function parseToken() {
-        const token = Cookies.get('jwt_token') ;
+        const token = Cookies.get('jwt_token');
         if (!token) { return; }
         const base64Url = token.split('.')[1];
         const base64 = base64Url.replace('-', '+').replace('_', '/');

@@ -20,14 +20,14 @@ const registerUser = async (userData, encryptKeys) => {
                 body: JSON.stringify(encData),
             });
             if (response.ok) {
-                return { status : true , message :`welcome user ${userData.username}`};
+                return { status: true, message: `welcome user ${userData.username}` };
             } else {
-                return {status : true, message : `uable to register the user`}
+                return { status: true, message: `uable to register the user` }
             }
         } catch (error) {
-            return {status : true, message : `uable to register the user`}
+            return { status: true, message: `uable to register the user` }
         } finally {
-            return { status : true , message :`welcome user ${userData.username}`};
+            return { status: true, message: `welcome user ${userData.username}` };
         }
     }
     onSubmit()

@@ -23,10 +23,10 @@ const Base64ImageDisplay = () => {
         setError(null);
 
         const token = Cookies.get('jwt_token');
-               if (!token || token === 'undefined') {
-                   setIsLoading(false);
-                   return;
-               }
+        if (!token || token === 'undefined') {
+            setIsLoading(false);
+            return;
+        }
 
         try {
             const response = await fetch(`${process.env.NEXT_PUBLIC_HOST || "http://127.0.0.1:3000"}/user/get/image`, {
@@ -75,7 +75,7 @@ const Base64ImageDisplay = () => {
             }
             fetchImage();
         }
-        
+
     }, []);
 
     return (
@@ -83,39 +83,39 @@ const Base64ImageDisplay = () => {
             {error &&
                 <div className="">
                     <ErroToaster message={error} />
-                    </div>}
+                </div>}
             {isLoading ? (
                 <div className=" w-100% h-[90vh]  flex items-center justify-center flex-col">
-                <Loader />
+                    <Loader />
                 </div>
             ) : (
-                    (
-                        <div className=" w-100%  h-[90vh] flex items-center justify-center flex-col">
-                    
-                            <Card className="w-[350px] flex justify-center">
-                                
-                        <div className=" flex justify-start ml-6">
-                        <img
-                            src={imageSrc ? imageSrc  : session?.user?.image || "https://res.cloudinary.com/dzapdxkgc/image/upload/v1742595352/download_ykpnl5.png"}
-                            alt="Profile Image"
-                            className="w-32 h-32 object-cover rounded-full border-2 border-gray-400 shadow-lg filter brightness-100 contrast-125"
-                            style={{
-                                boxShadow: "0px 4px 15px rgba(0, 0, 0, 0.3), inset 0 0 20px rgba(0, 0, 0, 0.5)", // Outer shadow + Vignette effect
-                                background: "linear-gradient(to bottom, rgba(255,255,255,0.1), rgba(0,0,0,0.2))", // Subtle background gradient
-                            }}
-                        />
+                (
+                    <div className=" w-100%  h-[90vh] flex items-center justify-center flex-col">
 
-                            
-                        </div>
-                        <CardHeader>
-                          <CardTitle><span >Hello, </span > {`${userData.first_name || session?.user?.name || ''} ${userData.middle_name || ''} ${userData.last_name || ''}`.trim()}</CardTitle>
-                          <CardDescription>Welcome! Hope you have a great day! ☀️</CardDescription>
-                        </CardHeader>
-                        <CardContent>
-                        </CardContent>
+                        <Card className="w-[350px] flex justify-center">
 
-                            </Card>
+                            <div className=" flex justify-start ml-6">
+                                <img
+                                    src={imageSrc ? imageSrc : session?.user?.image || "https://res.cloudinary.com/dzapdxkgc/image/upload/v1742595352/download_ykpnl5.png"}
+                                    alt="Profile Image"
+                                    className="w-32 h-32 object-cover rounded-full border-2 border-gray-400 shadow-lg filter brightness-100 contrast-125"
+                                    style={{
+                                        boxShadow: "0px 4px 15px rgba(0, 0, 0, 0.3), inset 0 0 20px rgba(0, 0, 0, 0.5)", // Outer shadow + Vignette effect
+                                        background: "linear-gradient(to bottom, rgba(255,255,255,0.1), rgba(0,0,0,0.2))", // Subtle background gradient
+                                    }}
+                                />
+
+
                             </div>
+                            <CardHeader>
+                                <CardTitle><span >Hello, </span > {`${userData.first_name || session?.user?.name || ''} ${userData.middle_name || ''} ${userData.last_name || ''}`.trim()}</CardTitle>
+                                <CardDescription>Welcome! Hope you have a great day! ☀️</CardDescription>
+                            </CardHeader>
+                            <CardContent>
+                            </CardContent>
+
+                        </Card>
+                    </div>
                 )
             )}
         </div>

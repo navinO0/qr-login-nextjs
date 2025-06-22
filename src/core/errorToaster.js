@@ -8,21 +8,21 @@ const ErroToaster = ({ message, success }) => {
   const timeoutRef = useRef(null); // Store timeout reference
 
   const toastOptions = {
-      position: "bottom-center",
-      autoClose: 2000,
-      hideProgressBar: true,
-      closeOnClick: false,
-      pauseOnHover: false,
-      draggable: false,
-      theme: "colored",
-      transition: Bounce,
-    };
+    position: "bottom-center",
+    autoClose: 2000,
+    hideProgressBar: true,
+    closeOnClick: false,
+    pauseOnHover: false,
+    draggable: false,
+    theme: "colored",
+    transition: Bounce,
+  };
   useEffect(() => {
     if (message) {
       // Prevent multiple toasts
       if (!toastIdRef.current || !toast.isActive(toastIdRef.current)) {
         timeoutRef.current = setTimeout(() => {
-            toastIdRef.current = success ? toast.success(message, toastOptions) : toast.error(message, toastOptions);
+          toastIdRef.current = success ? toast.success(message, toastOptions) : toast.error(message, toastOptions);
         }, 50); // 2-second delay before showing toast
       }
     }

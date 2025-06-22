@@ -5,7 +5,7 @@ export function PopoverDemo({ children, buttonText = "Open Dialog" }) {
   return (
     <Dialog>
       <DialogTrigger asChild>
-      <Button variant="outline">{buttonText}</Button>
+        <Button variant="outline">{buttonText}</Button>
       </DialogTrigger>
       <DialogContent className="max-w-md">
         <DialogHeader>

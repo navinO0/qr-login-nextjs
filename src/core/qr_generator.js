@@ -8,7 +8,7 @@ import Link from 'next/link';
 function Qr_gen(props) {
     const { Canvas } = useQRCode();
     const { qr_link } = props
-    const link = qr_link.link  || process.env.NEXT_PUBLIC_HOST_QR
+    const link = qr_link.link || process.env.NEXT_PUBLIC_HOST_QR
     const code = qr_link.code
     const timeLeft = qr_link.time
     const formatTimeLeft = (seconds) => {
@@ -28,18 +28,18 @@ function Qr_gen(props) {
             }}>
                 Expires in: {formatTimeLeft(timeLeft)}
             </span>}
-        <Canvas
-            text={link}
-            options={{
-                errorCorrectionLevel: 'M',
-                margin: 3,
-                scale: 4,
-                width: 200,
-                color: {
-                    dark: '#000000',
-                    light: '#ffffff',
-                },
-            }}
+            <Canvas
+                text={link}
+                options={{
+                    errorCorrectionLevel: 'M',
+                    margin: 3,
+                    scale: 4,
+                    width: 200,
+                    color: {
+                        dark: '#000000',
+                        light: '#ffffff',
+                    },
+                }}
             />
             <span>{code}</span>
             <span>{link}</span>

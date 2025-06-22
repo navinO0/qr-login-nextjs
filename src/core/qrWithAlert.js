@@ -1,14 +1,14 @@
 'use client';
 
 import {
-    AlertDialog,
-    AlertDialogAction,
-    AlertDialogContent,
-    AlertDialogDescription,
-    AlertDialogFooter,
-    AlertDialogHeader,
-    AlertDialogTitle,
-    AlertDialogTrigger,
+  AlertDialog,
+  AlertDialogAction,
+  AlertDialogContent,
+  AlertDialogDescription,
+  AlertDialogFooter,
+  AlertDialogHeader,
+  AlertDialogTitle,
+  AlertDialogTrigger,
 } from "@/components/ui/alert-dialog"
 import { MdOutlineQrCode2 } from "react-icons/md";
 import { Button } from "@/components/ui/button"
@@ -24,139 +24,139 @@ import { useRouter } from "next/navigation";
 const QRTimerInMints = process.env.NEXT_PUBLIC_QR_TIMER || 1;
 
 function getHost(req = null) {
-    if (typeof window !== "undefined") {
-        // Client-side: Get the protocol and hostname
-        return `${window.location.protocol}//${window.location.host}`;
-    } else {
-        // Server-side: Get VM IP
-        const networkInterfaces = os.networkInterfaces();
-        let vmIP = "127.0.0.1"; // Default localhost
+  if (typeof window !== "undefined") {
+    // Client-side: Get the protocol and hostname
+    return `${window.location.protocol}//${window.location.host}`;
+  } else {
+    // Server-side: Get VM IP
+    const networkInterfaces = os.networkInterfaces();
+    let vmIP = "127.0.0.1"; // Default localhost
 
-        // Loop through network interfaces to find the first valid non-internal IP
-        for (const interfaceKey in networkInterfaces) {
-            for (const net of networkInterfaces[interfaceKey]) {
-                if (!net.internal && net.family === "IPv4") {
-                    vmIP = net.address;
-                    break;
-                }
-            }
+    // Loop through network interfaces to find the first valid non-internal IP
+    for (const interfaceKey in networkInterfaces) {
+      for (const net of networkInterfaces[interfaceKey]) {
+        if (!net.internal && net.family === "IPv4") {
+          vmIP = net.address;
+          break;
         }
-
-        // If Next.js API request is provided, use request host
-        const host = req?.headers?.host || `${vmIP}:3000`;
-        return `http://${host}`;
+      }
     }
+
+    // If Next.js API request is provided, use request host
+    const host = req?.headers?.host || `${vmIP}:3000`;
+    return `http://${host}`;
+  }
 }
 
 export function QrWithAlert() {
-    const [isLoading, setIsLoading] = useState(false);
-    const [qrLoginCode, setQrLoginCode] = useState('');
-    const [error, setError] = useState(null);
-    const [hostName, setHost] = useState(getHost());
-    const router = useRouter();
+  const [isLoading, setIsLoading] = useState(false);
+  const [qrLoginCode, setQrLoginCode] = useState('');
+  const [error, setError] = useState(null);
+  const [hostName, setHost] = useState(getHost());
+  const router = useRouter();
 
-    const [timeLeft, setTimeLeft] = useState(QRTimerInMints * 60); 
-    const [isTimerExpired, setIsTimerExpired] = useState(false); 
+  const [timeLeft, setTimeLeft] = useState(QRTimerInMints * 60);
+  const [isTimerExpired, setIsTimerExpired] = useState(false);
 
- 
-    const timerRef = useRef(null);
 
-   
-    const fetchQrCode = useCallback(async () => {
-        if (timerRef.current) {
-            clearInterval(timerRef.current);
+  const timerRef = useRef(null);
+
+
+  const fetchQrCode = useCallback(async () => {
+    if (timerRef.current) {
+      clearInterval(timerRef.current);
+    }
+
+    setIsLoading(true);
+    const token = Cookies.get('jwt_token');
+
+    setTimeLeft(QRTimerInMints * 60);
+    setIsTimerExpired(false);
+
+    if (!token || token === 'undefined') {
+      setIsLoading(false);
+      return;
+    }
+
+    try {
+      const response = await fetch(`${process.env.NEXT_PUBLIC_HOST || "http://127.0.0.1:3000"}/user/get/code`, {
+        method: 'POST',
+        headers: {
+          'Accept': 'application/json',
+          'Content-Type': 'application/json',
+          'authorization': `Bearer ${token}`,
+        },
+        body: JSON.stringify({ token: token }),
+      });
+
+      if (response.status === 401) {
+        Cookies.remove('jwt_token');
+        router.push("/session-expired");
+        // clearToken()
+      }
+      if (response.ok) {
+        const resp = await response.json();
+        const loginCode = resp.data.code;
+        if (!loginCode || loginCode === 'undefined') {
+          setError('No login code found');
+          setIsLoading(false);
+          return;
         }
+        setQrLoginCode(loginCode);
 
-        setIsLoading(true);
-        const token = Cookies.get('jwt_token');
-
-        setTimeLeft(QRTimerInMints * 60); 
-        setIsTimerExpired(false); 
-
-        if (!token || token === 'undefined') {
-            setIsLoading(false);
-            return;
-        }
-
-        try {
-            const response = await fetch(`${process.env.NEXT_PUBLIC_HOST || "http://127.0.0.1:3000"}/user/get/code`, {
-                method: 'POST',
-                headers: {
-                    'Accept': 'application/json',
-                    'Content-Type': 'application/json',
-                    'authorization': `Bearer ${token}`,
-                },
-                body: JSON.stringify({ token: token }),
-            });
-
-            if (response.status === 401) {
-                Cookies.remove('jwt_token');
-                router.push("/session-expired");
-                // clearToken()
+        timerRef.current = setInterval(() => {
+          setTimeLeft((prevTime) => {
+            if (prevTime <= 0) {
+              clearInterval(timerRef.current);
+              setIsTimerExpired(true);
+              return 0;
             }
-            if (response.ok) {
-                const resp = await response.json();
-                const loginCode = resp.data.code;
-                if (!loginCode || loginCode === 'undefined') {
-                    setError('No login code found');
-                    setIsLoading(false);
-                    return;
-                }
-                setQrLoginCode(loginCode); 
+            return prevTime - 1;
+          });
+        }, 1000);
+      } else {
+        const errorData = await response.json();
+        setError(errorData.message || 'An error occurred while logging in.');
+      }
+    } catch (error) {
+      setError('Failed to connect to the server.');
+      console.error('Login failed:', error);
+    } finally {
+      setIsLoading(false);
+    }
+  }, []);
 
-                timerRef.current = setInterval(() => {
-                    setTimeLeft((prevTime) => {
-                        if (prevTime <= 0) {
-                            clearInterval(timerRef.current); 
-                            setIsTimerExpired(true);
-                            return 0;
-                        }
-                        return prevTime - 1; 
-                    });
-                }, 1000);
-            } else {
-                const errorData = await response.json();
-                setError(errorData.message || 'An error occurred while logging in.');
-            }
-        } catch (error) {
-            setError('Failed to connect to the server.');
-            console.error('Login failed:', error);
-        } finally {
-            setIsLoading(false);
-        }
-    }, []); 
-
-    const handleOpenModal = () => {
-        fetchQrCode(); 
-    };
+  const handleOpenModal = () => {
+    fetchQrCode();
+  };
 
 
-    const formatTimeLeft = (seconds) => {
-        const minutes = Math.floor(seconds / 60);
-        const secs = seconds % 60;
-        return `${String(minutes).padStart(2, '0')}:${String(secs).padStart(2, '0')}`;
-    };
+  const formatTimeLeft = (seconds) => {
+    const minutes = Math.floor(seconds / 60);
+    const secs = seconds % 60;
+    return `${String(minutes).padStart(2, '0')}:${String(secs).padStart(2, '0')}`;
+  };
 
-   
-    const handleRefresh = () => {
-        setTimeLeft(QRTimerInMints * 60);
-        setIsTimerExpired(false); 
-        fetchQrCode(); 
-    };
 
-    const handleCloseModal = () => {
-        clearInterval(timerRef.current); 
-    };
+  const handleRefresh = () => {
+    setTimeLeft(QRTimerInMints * 60);
+    setIsTimerExpired(false);
+    fetchQrCode();
+  };
 
-    const host = getHost(); 
+  const handleCloseModal = () => {
+    clearInterval(timerRef.current);
+  };
 
- 
-    useEffect(() => {
-        return () => clearInterval(timerRef.current);
-    }, []);
+  const host = getHost();
 
-    return (
-           <AlertDialog>
+
+  useEffect(() => {
+    return () => clearInterval(timerRef.current);
+  }, []);
+
+  return (
+    <AlertDialog>
       <AlertDialogTrigger asChild>
         <span
           onClick={handleOpenModal}
@@ -168,7 +168,7 @@ export function QrWithAlert() {
             src="https://res.cloudinary.com/dzapdxkgc/image/upload/v1742564270/qrcode-scan-svgrepo-com_lcxjjd.svg"
             className="h-7 w-7"
                     /> */}
-                    <MdOutlineQrCode2  className="h-7 w-7" />
+          <MdOutlineQrCode2 className="h-7 w-7" />
         </span>
       </AlertDialogTrigger>
 
@@ -216,5 +216,5 @@ export function QrWithAlert() {
         </AlertDialogFooter>
       </AlertDialogContent>
     </AlertDialog>
-    );
+  );
 }

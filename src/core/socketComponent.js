@@ -5,15 +5,15 @@ const SocketInst = (roomId) => {
   const [socket, setSocket] = useState(null);
 
   useEffect(() => {
-    if (!userId) return; // Prevent starting socket without userId
+    if (!userId) return; 
 
-    const socket = io( "http://172.26.144.1:3008", {
-        transports: ["websocket"],
+    const socket = io("http://172.26.144.1:3008", {
+      transports: ["websocket"],
     });
 
     setSocket(socket);
 
-    return () => socket.disconnect(); // Cleanup on unmount
+    return () => socket.disconnect(); 
   }, [roomId]);
 
   return socket;

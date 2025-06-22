@@ -1,7 +1,7 @@
 import NextAuth from "next-auth";
 import GoogleProvider from "next-auth/providers/google";
 import jwt from "jsonwebtoken";
-import knex from "@/lib/knex"; 
+import knex from "@/lib/knex";
 
 export default NextAuth({
   providers: [
@@ -12,8 +12,8 @@ export default NextAuth({
   ],
   secret: process.env.NEXTAUTH_SECRET,
   callbacks: {
-    async signIn(app,{ user }) {
-          try {
+    async signIn(app, { user }) {
+      try {
         let existingUser = await app.knex("users").where({ email: user.email }).first();
 
         if (!existingUser) {

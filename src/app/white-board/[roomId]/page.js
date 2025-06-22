@@ -176,7 +176,7 @@ const CbWhiteBoard = () => {
             if (!isChatOpen) {
                 setUnreadCount((prev) => prev + 1);
             }
-
+            console.log(data);
             setLastMessage(data);
         });
 
@@ -314,11 +314,14 @@ const CbWhiteBoard = () => {
                             <PopoverContent side="top" align="end" className="!p-0 !m-0 w-auto h-auto">
                                 <div className={cn("flex p-1 my-1 w-full", "justify-start")}>
                                     <div className="relative flex flex-col align-start max-w-[80%] align-start items-start self-start justify-start">
-                                        <p className={cn("flex w-full text-[10px] font-semibold text-gray-500", "justify-center")}>{lastMessage.userId}</p>
+                                        <p className={cn("flex w-full text-[10px] font-semibold text-gray-500", "justify-center")}>{lastMessage.sender_username}</p>
                                         <div className={cn("rounded-lg p-0 min-w-[100px] text-sm break-words relative")}>
                                             <CardContent className="p-2 flex flex-col gap-1">
-                                                <p className="text-xs leading-tight break-words">{lastMessage.message}</p>
-                                                <div className="text-[10px] text-right text-gray-400">{lastMessage.time}</div>
+                                                <p className="text-xs leading-tight break-words">{lastMessage.content}</p>
+                                                <div className="text-[10px] text-right text-gray-400">{new Date(lastMessage.sent_at).toLocaleTimeString([], {
+                                                    hour: '2-digit',
+                                                    minute: '2-digit',
+                                                })}</div>
                                             </CardContent>
                                         </div>
                                     </div>

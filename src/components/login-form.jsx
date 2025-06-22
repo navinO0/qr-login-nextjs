@@ -13,9 +13,11 @@ import { encryptObjectValues } from "@/core/crypto-utils";
 import MiniLoader from "@/core/miniLoader";
 import ErroToaster from "@/core/errorToaster";
 import { useSession, signIn, signOut } from "next-auth/react";
+import { getDeviceInfo } from "@/core/getDeviceInfo";
 
 
 export function LoginForm({ className, ...props }) {
+  const [deviceInfo, setDeviceInfo] = useState(null);
   const router = useRouter();
   const { data: session } = useSession();
 
@@ -27,6 +29,13 @@ export function LoginForm({ className, ...props }) {
       }
     }
     fetchData();
+     const fetchDeviceInfo = async () => {
+          const info = await getDeviceInfo();
+          setDeviceInfo(info);
+          console.log('Device Info:', info);
+        };
+    
+        fetchDeviceInfo();
   }, [router]);
   async function handleEncrypt(data) {
     return await encryptObjectValues(data, ['username', 'password']);
@@ -67,6 +76,7 @@ export function LoginForm({ className, ...props }) {
         },
         body: JSON.stringify({
           ...encryptedData,
+          device_info : deviceInfo,
         }),
       });
 
@@ -171,7 +181,20 @@ export function LoginForm({ className, ...props }) {
             <a href="/register" className="underline underline-offset-4 text-blue-400">
               Sign up
             </a>
-          </div>
+              </div>
+              {enableNextAuth && <div className="flex flex-col gap-6">
+            {!session ? (
+              <Button onClick={handleLogin} className="w-full cursor-pointer bg-blue-600 hover:bg-blue-700">
+                Sign in with Google
+              </Button>
+            ) : (
+              <div>
+                <Button onClick={() => signOut()} className="w-full cursor-pointer bg-red-600 hover:bg-red-700">
+                  Logout
+                </Button>
+              </div>
+            )}
+          </div>}
         </div>
       </form>
       <div className="bg-slate-800 relative hidden md:block flex flex-col justify-center items-center border-l border-slate-700 login-cide-container">
@@ -194,19 +217,6 @@ export function LoginForm({ className, ...props }) {
           <Button type="button" onClick={form.handleSubmit(codeSubmit)} className="w-full cursor-pointer bg-green-600 hover:bg-green-700" disabled={isLoading1}>
             {isLoading1 ? <MiniLoader /> : "Submit"}
           </Button>
-          {enableNextAuth && <div className="flex flex-col gap-6">
-            {!session ? (
-              <Button onClick={handleLogin} className="w-full cursor-pointer bg-blue-600 hover:bg-blue-700">
-                Sign in with Google
-              </Button>
-            ) : (
-              <div>
-                <Button onClick={() => signOut()} className="w-full cursor-pointer bg-red-600 hover:bg-red-700">
-                  Logout
-                </Button>
-              </div>
-            )}
-          </div>}
           <ErroToaster message={error1} />
         </div>
       </div>

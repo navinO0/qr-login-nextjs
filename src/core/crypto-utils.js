@@ -1,4 +1,4 @@
-"use client"; 
+"use client";
 const KEY_HEX = process.env.NEXT_PUBLIC_KEY_HEX;
 
 function hexToUint8Array(hex) {

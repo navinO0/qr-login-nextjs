@@ -20,8 +20,8 @@ const Header = () => {
 
     checkToken(); // Check token on mount
 
-    const interval = setInterval(checkToken, 1000); 
-    return () => clearInterval(interval); 
+    const interval = setInterval(checkToken, 1000);
+    return () => clearInterval(interval);
   }, []);
 
   if (!visible) return null;
