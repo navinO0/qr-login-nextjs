@@ -318,10 +318,10 @@ const CbWhiteBoard = () => {
                                         <div className={cn("rounded-lg p-0 min-w-[100px] text-sm break-words relative")}>
                                             <CardContent className="p-2 flex flex-col gap-1">
                                                 <p className="text-xs leading-tight break-words">{lastMessage.content}</p>
-                                                <div className="text-[10px] text-right text-gray-400">{new Date(lastMessage.sent_at).toLocaleTimeString([], {
+                                                {/* <div className="text-[10px] text-right text-gray-400">{new Date(lastMessage.sent_at).toLocaleTimeString([], {
                                                     hour: '2-digit',
                                                     minute: '2-digit',
-                                                })}</div>
+                                                })}</div> */}
                                             </CardContent>
                                         </div>
                                     </div>
