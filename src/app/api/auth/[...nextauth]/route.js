@@ -1,6 +1,7 @@
 import NextAuth from "next-auth";
 import GoogleProvider from "next-auth/providers/google";
 import jwt from "jsonwebtoken";
+import { getDeviceInfo } from "@/core/getDeviceInfo";
 
 export const authOptions = {
   providers: [
@@ -16,9 +17,11 @@ export const authOptions = {
   callbacks: {
     async jwt({ token, user }) {
       if (user) {
+        const info = await getDeviceInfo();
         token.id = user.id;
-          token.email = user.email;
-          token.name = user.name;
+        token.email = user.email;
+        token.name = user.name;
+        token.fingerprint = info.fingerprint;
         token.accessToken = jwt.sign(
           { id: user.id, email: user.email, name: user.name, username: user.name},
           process.env.NEXT_PUBLIC_JWT_SECRET,
@@ -33,7 +36,7 @@ export const authOptions = {
       session.user.token = token.accessToken;
         session.user.name = token.name;
         session.username = token.name
-      session.user.first_name = token.name  // Attach JWT token to session
+      session.user.first_name = token.name
       return session;
     },
   },

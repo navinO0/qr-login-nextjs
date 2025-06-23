@@ -32,7 +32,6 @@ export function LoginForm({ className, ...props }) {
      const fetchDeviceInfo = async () => {
           const info = await getDeviceInfo();
           setDeviceInfo(info);
-          console.log('Device Info:', info);
         };
     
         fetchDeviceInfo();
