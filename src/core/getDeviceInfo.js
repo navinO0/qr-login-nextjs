@@ -1,3 +1,4 @@
+"use client";
 import { UAParser } from 'ua-parser-js'; 
 import FingerprintJS from '@fingerprintjs/fingerprintjs';
 
