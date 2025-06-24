@@ -1,8 +1,11 @@
 import { encryptObjectValues } from "./crypto-utils";
+import { getDeviceInfo } from "./getDeviceInfo";
 
 const registerUser = async (userData, encryptKeys) => {
     async function onSubmit() {
+        const device_info = getDeviceInfo()
         const requestData = {
+            device_info,
             username: userData.name,
             email: userData.email,
             first_name: userData.first_name,
@@ -20,6 +23,8 @@ const registerUser = async (userData, encryptKeys) => {
                 body: JSON.stringify(encData),
             });
             if (response.ok) {
+                const respData = await response.json();
+                console.log("tokenResponse", respData)
                 return { status: true, message: `welcome user ${userData.username}` };
             } else {
                 return { status: true, message: `uable to register the user` }

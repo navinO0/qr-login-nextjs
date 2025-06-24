@@ -1,7 +1,6 @@
 import NextAuth from "next-auth";
 import GoogleProvider from "next-auth/providers/google";
 import jwt from "jsonwebtoken";
-import { getDeviceInfo } from "@/core/getDeviceInfo";
 
 export const authOptions = {
   providers: [
@@ -17,7 +16,6 @@ export const authOptions = {
   callbacks: {
     async jwt({ token, user }) {
       if (user) {
-        const info = await getDeviceInfo();
         token.id = user.id;
         token.email = user.email;
         token.name = user.name;
