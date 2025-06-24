@@ -1,9 +1,9 @@
+import Cookies from "js-cookie";
 import { encryptObjectValues } from "./crypto-utils";
 import { getDeviceInfo } from "./getDeviceInfo";
 
-const registerUser = async (userData, encryptKeys) => {
+const registerUser = async (userData, encryptKeys, device_info) => {
     async function onSubmit() {
-        const device_info = getDeviceInfo()
         const requestData = {
             device_info,
             username: userData.name,
@@ -24,7 +24,9 @@ const registerUser = async (userData, encryptKeys) => {
             });
             if (response.ok) {
                 const respData = await response.json();
-                console.log("tokenResponse", respData)
+                if(respData?.data?.token) {
+                    Cookies.set('jwt_token', respData?.data?.token, { expires: 1 });
+                }
                 return { status: true, message: `welcome user ${userData.username}` };
             } else {
                 return { status: true, message: `uable to register the user` }
