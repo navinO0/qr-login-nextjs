@@ -19,7 +19,6 @@ export const authOptions = {
         token.id = user.id;
         token.email = user.email;
         token.name = user.name;
-        token.fingerprint = info.fingerprint;
         token.accessToken = jwt.sign(
           { id: user.id, email: user.email, name: user.name, username: user.name},
           process.env.NEXT_PUBLIC_JWT_SECRET,
