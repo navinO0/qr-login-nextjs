@@ -9,7 +9,7 @@ export const useApi = () => {
   const router = useRouter();
 
   const request = useCallback(async (url, options = {}, authRequire = true) => {
-      try {
+    try {
       const res = await fetch( `${process.env.NEXT_PUBLIC_HOST || "http://127.0.0.1:3000"}${url}`, {
         method: options.method || 'GET',
         headers: {
@@ -33,9 +33,10 @@ export const useApi = () => {
       }
       console.log("api response", res);
       const data = await res.json();
-      return { response: res, data };
+      return { response: res , data };
 
       } catch (err) {
+        console.log("api error", err);
       return { error: 'Network error' };
     }
   }, [router]);

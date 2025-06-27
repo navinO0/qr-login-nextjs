@@ -107,7 +107,6 @@ setError(null)
       }
 
       if (createResponse.status === 200) {
-        console.log("Room created successfully:", createResponse.data);
         router.push(`/white-board/${roomId}`);
       }
 

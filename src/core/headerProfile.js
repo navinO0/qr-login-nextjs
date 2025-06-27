@@ -79,7 +79,7 @@ const Base64ImageDisplay = () => {
     }, []);
 
     return (
-        <div className="flex-1 flex justify-center items-center relative w-[90vw] h-[90vh]">
+        <div className="bg-gradient-to-br from-slate-900 to-slate-800 flex-1 flex-shrink-0 flex justify-center items-center relative mx-auto h-auto">
             {error &&
                 <div className="">
                     <ErroToaster message={error} />
@@ -90,7 +90,7 @@ const Base64ImageDisplay = () => {
                 </div>
             ) : (
                 (
-                    <div className=" w-100%  h-[90vh] flex items-center justify-center flex-col">
+                    <div className=" w-100%  h-[95vh] flex items-center justify-center flex-col">
 
                         <Card className="w-[350px] flex justify-center">
 

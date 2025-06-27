@@ -21,7 +21,7 @@ export default function Home() {
   }, [session]);
   return (
       <div className="flex">
-        <div className="flex justify-center items-center ">
+        <div className="flex justify-center items-center w-full h-full">
           <Base64ImageDisplay />
         </div>
       </div>

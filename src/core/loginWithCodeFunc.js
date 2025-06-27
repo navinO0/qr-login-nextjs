@@ -11,7 +11,6 @@ const loginWithCodeFunc = async (loginCode) => {
 
     try {
         const deviceInfo = await getDeviceInfo();
-        console.log('Device Info:', deviceInfo);
 
         const response = await fetch(`${process.env.NEXT_PUBLIC_HOST || "http://127.0.0.1:3000"}/user/login/code/${loginCode}`, {
             method: 'POST',
