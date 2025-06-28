@@ -14,12 +14,14 @@ import MiniLoader from "@/core/miniLoader";
 import ErroToaster from "@/core/errorToaster";
 import { useSession, signIn, signOut } from "next-auth/react";
 import { getDeviceInfo } from "@/core/getDeviceInfo";
+import { useUserContext } from "../app/providers";
 
 
 export function LoginForm({ className, ...props }) {
   const [deviceInfo, setDeviceInfo] = useState(null);
   const router = useRouter();
   const { data: session } = useSession();
+  const { setIsLoggedIn } = useUserContext();
 
   useEffect(() => {
     async function fetchData() {
@@ -87,7 +89,7 @@ export function LoginForm({ className, ...props }) {
           return
         }
         Cookies.set('jwt_token', token, { expires: 1 });
-
+        setIsLoggedIn(true);
         router.push('/');
       } else {
         const errorData = await response.json();

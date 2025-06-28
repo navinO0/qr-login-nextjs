@@ -19,9 +19,11 @@ export default function Home() {
   const { data: session } = useSession();
   const { redirect } = useUserContext();
   const router = useRouter();
+    const { isLoggedIn } = useUserContext();
 
   useMemo(() => {
     const init = async () => {
+    
       if (!session?.user?.token || session?.user?.token === "undefined") return;
       const Dinfo = await getDeviceInfo();
       setDeviceInfo(Dinfo);
@@ -42,10 +44,8 @@ export default function Home() {
     };
 
     init();
-  }, [session]);
+  }, []);
 
-  useEffect(() => {
-  }, [userData]);
   useProtectedRoute();
   return (
     <LandingPage />

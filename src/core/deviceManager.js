@@ -7,7 +7,6 @@ import { useApi } from "./useApi";
 import { getDeviceInfo } from "./getDeviceInfo";
 import { SlScreenDesktop } from "react-icons/sl";
 import { CiMobile3 } from "react-icons/ci";
-import ErroToaster from "./errorToaster";
 import { Loader } from "lucide-react";
 import { useUserContext } from "../app/providers";
 
@@ -58,8 +57,9 @@ const DeviceManager = () => {
         device_fingerprint: fingerprint
       }
     }, true);
-    fetchData();
+    // fetchData();
     setSuccess(data.data.message);
+    setTimeout(fetchData, 3000);
     if (error) {
       console.error("Failed to logout", error);
       setError(error);
@@ -79,7 +79,6 @@ const DeviceManager = () => {
               }
               return (<div key={index}>
                 <div>
-                  {/* <h4 className="text-sm leading-none font-medium">{device.deviceType}</h4> */}
                   {device.deviceType === "desktop" ? <SlScreenDesktop fontSize={25} /> : <CiMobile3 fontSize={25} />}
                   <div className="flex align-center justify-between gap-2">
                     <>

@@ -3,7 +3,7 @@
 import { useState, useEffect } from "react";
 import { Calendar, Home, Inbox, Search, Settings, Pencil, UserRoundPen } from "lucide-react";
 import Cookies from "js-cookie";
-
+import { useUserContext } from "../app/providers";
 import {
   Sidebar,
   SidebarContent,
@@ -36,26 +36,25 @@ const items = [
 ];
 
 export function AppSidebar() {
-  const [visible, setVisible] = useState(false);
+  const { isLoggedIn } = useUserContext();
+  // useEffect(() => {
+  //   const checkToken = () => {
+  //     const token = Cookies.get("jwt_token");
+  //     setVisible(!!token && token !== "undefined");
+  //   };
 
-  useEffect(() => {
-    const checkToken = () => {
-      const token = Cookies.get("jwt_token");
-      setVisible(!!token && token !== "undefined");
-    };
+  //   checkToken(); // Check token on mount
 
-    checkToken(); // Check token on mount
+  //   const interval = setInterval(checkToken, 1000);
+  //   return () => clearInterval(interval);
+  // }, []);
 
-    const interval = setInterval(checkToken, 1000);
-    return () => clearInterval(interval);
-  }, []);
-
-  if (!visible) return null;
+  if (!isLoggedIn) return null;
   return (
     <Sidebar variant="sidebar" collapsible="icon">
       <SidebarContent className="h-full bg-gray-800 text-white">
         <SidebarGroup>
-          <SidebarGroupLabel className="text-lg text-gray-400 py-4 px-6">Application</SidebarGroupLabel>
+          <SidebarGroupLabel className="text-lg text-gray-400 py-4 px-6">Menu</SidebarGroupLabel>
           <SidebarGroupContent>
             <SidebarMenu>
               {items.map((item) => (

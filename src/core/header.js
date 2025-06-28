@@ -22,25 +22,25 @@ import {
 import { Card, CardContent } from "@/components/ui/card";
 import { cn } from "@/lib/utils";
 import DeviceManager from "./deviceManager";
-import ErroToaster from "./errorToaster";
+import { useUserContext } from "../app/providers";
 
 const Header = () => {
   const [visible, setVisible] = useState(false);
   const [isOpen, setIsOpen] = useState(false);
-
+ const { isLoggedIn } = useUserContext();
   useEffect(() => {
     const checkToken = () => {
       const token = Cookies.get("jwt_token");
       setVisible(!!token && token !== "undefined");
     };
 
-    checkToken(); // 
+    checkToken(); 
 
     const interval = setInterval(checkToken, 3000);
     return () => clearInterval(interval);
   }, []);
 
-  if (!visible) return null;
+  if (!isLoggedIn) return null;
 
   const handleOpenChange = () => setIsOpen(() => !isOpen);
 

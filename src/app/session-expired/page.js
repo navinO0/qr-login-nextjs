@@ -3,13 +3,17 @@ import { Button } from "@/components/ui/button";
 import Cookies from "js-cookie";
 import { signOut } from "next-auth/react";
 import { useRouter } from "next/navigation";
+import { useUserContext } from "../providers";
 
 
 const SessionExpired = () => {
-     const router = useRouter();
+    const router = useRouter();
+    const { setIsLoggedIn } = useUserContext();
+    setIsLoggedIn(false);
     const redirectToLogin = () => {
         Cookies.remove("jwt_token");
-         signOut({ callbackUrl: `${process.env.NEXT_PUBLIC_HOST_QR}/login` });
+        setIsLoggedIn(false);
+        signOut({ callbackUrl: `${process.env.NEXT_PUBLIC_HOST_QR}/login` });
     };
     return (
         <div className="flex flex-col items-center justify-center min-h-screen text-center">

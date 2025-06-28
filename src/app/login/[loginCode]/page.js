@@ -6,6 +6,7 @@ import loginWithCodeFunc from '@/core/loginWithCodeFunc';
 import Loader from '@/core/loader';
 import ErroToaster from '@/core/errorToaster';
 import { Button } from '@/components/ui/button';
+import { useUserContext } from '@/app/providers';
 
 const LoginWithCode = () => {
     const params = useParams();
@@ -13,6 +14,7 @@ const LoginWithCode = () => {
     const [loginCode, setLoginCode] = useState(null);
     const [isLoading, setIsLoading] = useState(false);
     const [error, setError] = useState(null); 
+    const { setIsLoggedIn } = useUserContext();
 
 
     useEffect(() => {
@@ -36,6 +38,7 @@ const LoginWithCode = () => {
                     setError(logi.message)
                     return
                 }
+                   setIsLoggedIn(true);
                 router.push("/")
             }
         } catch (error) {
@@ -49,6 +52,7 @@ const LoginWithCode = () => {
         if (!logi) {
             router.push("/login")
         }
+        setIsLoggedIn(true);
         router.push("/")
     };
 
