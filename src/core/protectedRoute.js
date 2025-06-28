@@ -9,10 +9,10 @@ const useProtectedRoute = () => {
 
     useEffect(() => {
         const token = Cookies.get("jwt_token");
-        if (!token || token === "undefined" || token === "null" || token === undefined) {
+        if (!token || token === "undefined" || token === null || token === undefined) {
             router.push("/login");
         }
-    }, [router]);
+    }, []);
 };
 
 export default useProtectedRoute;

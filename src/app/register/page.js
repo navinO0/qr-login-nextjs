@@ -123,8 +123,10 @@ const Register = () => {
           setError(resp.message || "Invalid token received");
           return { status: false, message: resp.message };
         }
-
-        Cookies.set('jwt_token', token, { expires: 1 });
+        if(!token || token === "null" || token === undefined) {
+           Cookies.set('jwt_token', token, { expires: 1 });
+        }
+       
         setSuccessMessage('User registered successfully!');
         router.push("/");
       } else {

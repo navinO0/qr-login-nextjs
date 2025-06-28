@@ -131,7 +131,7 @@ export function LoginForm({ className, ...props }) {
         console.error("Login failed", res.error);
       }
       else {
-        Cookies.set("jwt_token", session?.user?.token || null, { expires: 7 });
+        Cookies.set("jwt_token", session?.user?.token || null , { expires: 7 });
       }
   };
   
